@@ -49,10 +49,12 @@ app.use((_req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// ── Start server ───────────────────────────────
-app.listen(env.PORT, () => {
-  console.log(`✓ Server running on http://localhost:${env.PORT}`);
-  console.log(`✓ Allowing CORS from ${Array.from(allowedOrigins).join(", ")}`);
-});
+// ── Start server (skipped on Vercel — it handles listening) ──
+if (!process.env.VERCEL) {
+  app.listen(env.PORT, () => {
+    console.log(`✓ Server running on http://localhost:${env.PORT}`);
+    console.log(`✓ Allowing CORS from ${Array.from(allowedOrigins).join(", ")}`);
+  });
+}
 
 export default app;
