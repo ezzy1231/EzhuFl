@@ -15,7 +15,7 @@ interface LeaderboardResponse {
 
 export async function getAllCampaigns(): Promise<Campaign[]> {
   const { data } = await api.get<CampaignsResponse>("/api/campaigns");
-  return data.campaigns;
+  return data.campaigns || [];
 }
 
 export async function getCampaignById(id: string): Promise<Campaign> {
@@ -25,7 +25,7 @@ export async function getCampaignById(id: string): Promise<Campaign> {
 
 export async function getMyCampaigns(): Promise<Campaign[]> {
   const { data } = await api.get<CampaignsResponse>("/api/campaigns/my");
-  return data.campaigns;
+  return data.campaigns || [];
 }
 
 export async function createCampaign(payload: {
