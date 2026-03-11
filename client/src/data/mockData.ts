@@ -1,0 +1,250 @@
+import type { Campaign, LeaderboardEntry, User } from "../types";
+
+// ── Mock Users ──
+export const mockInfluencer: User = {
+  id: "u1",
+  name: "Abel Tesfaye",
+  email: "abel@example.com",
+  role: "INFLUENCER",
+  created_at: "2025-12-01T00:00:00Z",
+};
+
+export const mockBusiness: User = {
+  id: "b1",
+  name: "Addis Coffee Co.",
+  email: "hello@addiscoffee.et",
+  role: "BUSINESS",
+  created_at: "2025-11-15T00:00:00Z",
+};
+
+// ── Mock Campaigns ──
+export const mockCampaigns: Campaign[] = [
+  {
+    id: "c1",
+    business_id: "b1",
+    title: "Summer Coffee Challenge",
+    description:
+      "Create a fun, viral TikTok showing your favorite Addis Coffee moment. Best content wins the grand prize!",
+    budget: 5000,
+    duration_days: 3,
+    winners_count: 5,
+    status: "ACTIVE",
+    start_date: "2026-02-24T00:00:00Z",
+    end_date: "2026-02-27T00:00:00Z",
+    created_at: "2026-02-24T00:00:00Z",
+  },
+  {
+    id: "c2",
+    business_id: "b1",
+    title: "Ethiopian Fashion Week Promo",
+    description:
+      "Showcase traditional Ethiopian fashion with a modern twist. Post a TikTok or Reel featuring our collection.",
+    budget: 3000,
+    duration_days: 2,
+    winners_count: 3,
+    status: "ACTIVE",
+    start_date: "2026-02-25T00:00:00Z",
+    end_date: "2026-02-27T00:00:00Z",
+    created_at: "2026-02-25T00:00:00Z",
+  },
+  {
+    id: "c3",
+    business_id: "b1",
+    title: "Injera Taste Test Challenge",
+    description:
+      "Film friends or family trying injera for the first time — reactions, reviews, and fun vibes only!",
+    budget: 2000,
+    duration_days: 1,
+    winners_count: 3,
+    status: "ACTIVE",
+    start_date: "2026-02-26T00:00:00Z",
+    end_date: "2026-02-27T00:00:00Z",
+    created_at: "2026-02-26T00:00:00Z",
+  },
+  {
+    id: "c4",
+    business_id: "b1",
+    title: "Habesha Gym Motivation",
+    description:
+      "Show your workout routine and tag Habesha Fitness. Most engaging video wins!",
+    budget: 1500,
+    duration_days: 2,
+    winners_count: 3,
+    status: "COMPLETED",
+    start_date: "2026-02-20T00:00:00Z",
+    end_date: "2026-02-22T00:00:00Z",
+    created_at: "2026-02-20T00:00:00Z",
+  },
+  {
+    id: "c5",
+    business_id: "b1",
+    title: "Addis Music Festival Coverage",
+    description:
+      "Cover the Addis Music Festival — vlogs, highlights, backstage content. Be creative!",
+    budget: 8000,
+    duration_days: 3,
+    winners_count: 5,
+    status: "ACTIVE",
+    start_date: "2026-02-24T00:00:00Z",
+    end_date: "2026-02-27T00:00:00Z",
+    created_at: "2026-02-24T00:00:00Z",
+  },
+  {
+    id: "c6",
+    business_id: "b1",
+    title: "EthioTech Unboxing",
+    description:
+      "Unbox and review the latest EthioTech gadgets on TikTok or Instagram Reels.",
+    budget: 4000,
+    duration_days: 2,
+    winners_count: 3,
+    status: "DRAFT",
+    start_date: null,
+    end_date: null,
+    created_at: "2026-02-26T00:00:00Z",
+  },
+];
+
+// ── Mock Leaderboard ──
+export const mockLeaderboard: LeaderboardEntry[] = [
+  {
+    rank: 1,
+    user_id: "u1",
+    user_name: "Abel Tesfaye",
+    video_url: "https://tiktok.com/@abel/video/1",
+    views: 125000,
+    likes: 18500,
+    comments: 2340,
+    score: 125000 + 18500 * 5 + 2340 * 10,
+    submitted_at: "2026-02-25T10:00:00Z",
+  },
+  {
+    rank: 2,
+    user_id: "u2",
+    user_name: "Sara Kebede",
+    video_url: "https://tiktok.com/@sara/video/1",
+    views: 98000,
+    likes: 14200,
+    comments: 1890,
+    score: 98000 + 14200 * 5 + 1890 * 10,
+    submitted_at: "2026-02-25T11:30:00Z",
+  },
+  {
+    rank: 3,
+    user_id: "u3",
+    user_name: "Dawit Haile",
+    video_url: "https://tiktok.com/@dawit/video/1",
+    views: 85000,
+    likes: 12100,
+    comments: 1560,
+    score: 85000 + 12100 * 5 + 1560 * 10,
+    submitted_at: "2026-02-25T09:00:00Z",
+  },
+  {
+    rank: 4,
+    user_id: "u4",
+    user_name: "Hana Girma",
+    video_url: "https://instagram.com/p/hana1",
+    views: 72000,
+    likes: 10500,
+    comments: 1200,
+    score: 72000 + 10500 * 5 + 1200 * 10,
+    submitted_at: "2026-02-25T14:00:00Z",
+  },
+  {
+    rank: 5,
+    user_id: "u5",
+    user_name: "Yonas Tadesse",
+    video_url: "https://tiktok.com/@yonas/video/1",
+    views: 65000,
+    likes: 9200,
+    comments: 980,
+    score: 65000 + 9200 * 5 + 980 * 10,
+    submitted_at: "2026-02-25T12:45:00Z",
+  },
+  {
+    rank: 6,
+    user_id: "u6",
+    user_name: "Meron Assefa",
+    video_url: "https://tiktok.com/@meron/video/1",
+    views: 54000,
+    likes: 7800,
+    comments: 720,
+    score: 54000 + 7800 * 5 + 720 * 10,
+    submitted_at: "2026-02-25T16:00:00Z",
+  },
+  {
+    rank: 7,
+    user_id: "u7",
+    user_name: "Tigist Bekele",
+    video_url: "https://instagram.com/p/tigist1",
+    views: 48000,
+    likes: 6900,
+    comments: 650,
+    score: 48000 + 6900 * 5 + 650 * 10,
+    submitted_at: "2026-02-25T08:30:00Z",
+  },
+  {
+    rank: 8,
+    user_id: "u8",
+    user_name: "Biniam Solomon",
+    video_url: "https://tiktok.com/@biniam/video/1",
+    views: 41000,
+    likes: 5800,
+    comments: 520,
+    score: 41000 + 5800 * 5 + 520 * 10,
+    submitted_at: "2026-02-25T17:15:00Z",
+  },
+];
+
+// ── Mock Stats ──
+export const mockInfluencerStats = {
+  totalEarnings: 1250,
+  activeCampaigns: 3,
+  currentRank: 2,
+  pendingRewards: 500,
+  totalViews: 245000,
+  winRate: 67,
+};
+
+export const mockBusinessStats = {
+  activeCampaigns: 4,
+  totalSpent: 15500,
+  totalParticipants: 156,
+  avgEngagement: 8.4,
+  completedCampaigns: 12,
+  totalCreators: 89,
+};
+
+// ── Mock Testimonials ──
+export const mockTestimonials = [
+  {
+    name: "Sara Kebede",
+    role: "TikTok Creator · 50K followers",
+    quote:
+      "I earned $2,000 in my first month on CreatorPay. The competition format keeps me motivated to create my best content!",
+    avatar: "SK",
+  },
+  {
+    name: "Addis Coffee Co.",
+    role: "Business · Food & Beverage",
+    quote:
+      "We got 500K+ views across 30 creator videos for just $5,000. The ROI is unbeatable compared to traditional ads.",
+    avatar: "AC",
+  },
+  {
+    name: "Dawit Haile",
+    role: "Instagram Creator · 120K followers",
+    quote:
+      "The leaderboard system makes it exciting. You can see your rankings in real-time and push harder for the top spot.",
+    avatar: "DH",
+  },
+];
+
+// ── Past Results (for profile) ──
+export const mockPastResults = [
+  { campaign: "Summer Coffee Challenge", rank: 1, prize: 2000, date: "2026-02-15" },
+  { campaign: "Addis Music Festival", rank: 3, prize: 500, date: "2026-02-10" },
+  { campaign: "Ethiopian Fashion Week", rank: 2, prize: 1000, date: "2026-01-28" },
+  { campaign: "Street Food Tour", rank: 5, prize: 200, date: "2026-01-15" },
+];
