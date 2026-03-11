@@ -15,6 +15,8 @@ import { LoginPage } from "./pages/public/LoginPage";
 import { SignupPage } from "./pages/public/SignupPage";
 import { LeaderboardPage } from "./pages/public/LeaderboardPage";
 import { AuthCallbackPage } from "./pages/public/AuthCallbackPage";
+import { TermsPage } from "./pages/public/TermsPage";
+import { PrivacyPage } from "./pages/public/PrivacyPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
 // Influencer pages
@@ -74,6 +76,8 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/leaderboard/:id" element={<LeaderboardPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
       </Route>
 
       {/* ── OAuth callback (no layout chrome) ── */}
