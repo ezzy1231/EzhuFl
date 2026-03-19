@@ -47,6 +47,8 @@ export async function getAllCampaigns(
   res: Response
 ): Promise<void> {
   try {
+    // Auto-complete any expired campaigns before listing
+    await campaignService.completeExpiredCampaigns();
     const campaigns = await campaignService.getAllCampaigns();
     res.status(200).json({ campaigns });
   } catch (err: any) {
@@ -151,5 +153,27 @@ export async function checkJoined(
   } catch (err: any) {
     console.error("Check joined error:", err);
     res.status(500).json({ error: err.message || "Internal server error" });
+  }
+}
+
+/**
+ * POST /api/campaigns/:id/complete — Complete a campaign and award winners
+ */
+export async function completeCampaign(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id as string;
+    const result = await campaignService.completeCampaign(id);
+    res.status(200).json(result);
+  } catch (err: any) {
+    console.error("Complete campaign error:", err);
+    const status = err.message?.includes("not found")
+      ? 404
+      : err.message?.includes("already completed")
+        ? 409
+        : 500;
+    res.status(status).json({ error: err.message || "Internal server error" });
   }
 }

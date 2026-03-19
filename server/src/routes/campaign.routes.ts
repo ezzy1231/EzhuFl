@@ -13,6 +13,7 @@ import {
   joinCampaign,
   getJoinedCampaigns,
   checkJoined,
+  completeCampaign,
 } from "../controllers/campaign.controller.js";
 import { getLeaderboard } from "../controllers/leaderboard.controller.js";
 
@@ -41,5 +42,8 @@ router.get("/:id/joined", authMiddleware, checkJoined);
 
 // Leaderboard (authenticated)
 router.get("/:id/leaderboard", authMiddleware, getLeaderboard);
+
+// Complete a campaign and award winners (business owner or admin)
+router.post("/:id/complete", authMiddleware, businessOnly, completeCampaign);
 
 export default router;
