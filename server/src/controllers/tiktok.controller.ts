@@ -165,11 +165,27 @@ export async function tiktokCallback(
     const syntheticEmail = `tiktok.${tiktokOpenId}@tiktok.users.noreply`;
 
     // ── Find or create Supabase user ──
-    // Search by synthetic email
-    const { data: existingUsers } = await supabase.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(
-      (u) => u.email === syntheticEmail
-    );
+    // Look up by synthetic email directly (avoids pagination issues with listUsers)
+    const { data: userByEmail } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", syntheticEmail)
+      .single();
+
+    // Also try admin getUserById list with filter as fallback
+    let existingUser: any = null;
+    if (userByEmail) {
+      const { data: adminUser } = await supabase.auth.admin.getUserById(userByEmail.id);
+      existingUser = adminUser?.user || null;
+    }
+
+    // If not found via users table, try listUsers with a targeted approach
+    if (!existingUser) {
+      const { data: listedUsers } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+      existingUser = listedUsers?.users?.find(
+        (u) => u.email === syntheticEmail
+      ) || null;
+    }
 
     let userId: string;
 
@@ -209,14 +225,29 @@ export async function tiktokCallback(
         });
 
       if (createErr || !newUser.user) {
-        console.error("Failed to create Supabase user for TikTok:", createErr);
-        res.redirect(
-          `${clientUrl}/login?error=${encodeURIComponent("Failed to create account")}`
-        );
-        return;
+        // If user already exists (race condition or lookup miss), find and use them
+        if (createErr && (createErr as any).code === "email_exists") {
+          const { data: retryList } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+          const found = retryList?.users?.find((u) => u.email === syntheticEmail);
+          if (found) {
+            userId = found.id;
+          } else {
+            console.error("User exists but cannot be found:", createErr);
+            res.redirect(
+              `${clientUrl}/login?error=${encodeURIComponent("Failed to create account")}`
+            );
+            return;
+          }
+        } else {
+          console.error("Failed to create Supabase user for TikTok:", createErr);
+          res.redirect(
+            `${clientUrl}/login?error=${encodeURIComponent("Failed to create account")}`
+          );
+          return;
+        }
+      } else {
+        userId = newUser.user.id;
       }
-
-      userId = newUser.user.id;
     }
 
     // ── Generate a magic link so the client gets a real Supabase session ──
