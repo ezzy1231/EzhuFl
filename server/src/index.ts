@@ -13,6 +13,7 @@ const app = express();
 
 const allowedOrigins = new Set([
   env.CLIENT_URL,
+  "https://ezhu.vercel.app",
   "http://localhost:5173",
   "http://localhost:5174",
 ]);
