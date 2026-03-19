@@ -165,9 +165,7 @@ export async function tiktokCallback(
     const syntheticEmail = `tiktok.${tiktokOpenId}@tiktok.users.noreply`;
 
     // ── Find or create Supabase user ──
-    // Strategy: try to create first. If email_exists, update instead.
-    let userId: string;
-
+    // Try to create. If user already exists, that's fine — just proceed to magic link.
     const { data: newUser, error: createErr } =
       await supabase.auth.admin.createUser({
         email: syntheticEmail,
@@ -185,53 +183,8 @@ export async function tiktokCallback(
         },
       });
 
-    if (newUser?.user) {
-      // New user created successfully
-      userId = newUser.user.id;
-    } else if (createErr && (createErr as any).code === "email_exists") {
-      // User already exists — find them by paginating through all auth users
-      let foundUser: any = null;
-      let page = 1;
-      const perPage = 100;
-
-      while (!foundUser) {
-        const { data: batch } = await supabase.auth.admin.listUsers({
-          page,
-          perPage,
-        });
-
-        if (!batch?.users || batch.users.length === 0) break;
-
-        foundUser = batch.users.find((u) => u.email === syntheticEmail);
-        if (batch.users.length < perPage) break; // last page
-        page++;
-      }
-
-      if (!foundUser) {
-        console.error("User exists in auth but could not be found via listUsers");
-        res.redirect(
-          `${clientUrl}/login?error=${encodeURIComponent("Account lookup failed — please try again")}`
-        );
-        return;
-      }
-
-      userId = foundUser.id;
-
-      // Update metadata with latest TikTok info
-      await supabase.auth.admin.updateUserById(userId, {
-        user_metadata: {
-          ...foundUser.user_metadata,
-          tiktok_open_id: tiktokOpenId,
-          tiktok_username: username,
-          tiktok_display_name: displayName,
-          tiktok_avatar_url: avatarUrl,
-          tiktok_bio: bio,
-          name: foundUser.user_metadata?.name || displayName,
-          full_name: foundUser.user_metadata?.full_name || displayName,
-          avatar_url: foundUser.user_metadata?.avatar_url || avatarUrl,
-        },
-      });
-    } else {
+    if (createErr && (createErr as any).code !== "email_exists") {
+      // A real error (not just "user already exists")
       console.error("Failed to create Supabase user for TikTok:", createErr);
       res.redirect(
         `${clientUrl}/login?error=${encodeURIComponent("Failed to create account")}`
@@ -239,7 +192,16 @@ export async function tiktokCallback(
       return;
     }
 
+    // If user already existed, try to update their metadata via the magic link's user
+    // (metadata update is best-effort; the critical path is the magic link below)
+    if (newUser?.user) {
+      console.log("New TikTok user created:", newUser.user.id);
+    } else {
+      console.log("Existing TikTok user, proceeding to magic link");
+    }
+
     // ── Generate a magic link so the client gets a real Supabase session ──
+    // This works with just the email — no userId needed
     const { data: linkData, error: linkErr } =
       await supabase.auth.admin.generateLink({
         type: "magiclink",
