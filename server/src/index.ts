@@ -8,6 +8,7 @@ import campaignRoutes from "./routes/campaign.routes.js";
 import submissionRoutes from "./routes/submission.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import tiktokRoutes from "./routes/tiktok.routes.js";
+import statsRoutes from "./routes/stats.routes.js";
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/campaigns", campaignRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/stats", statsRoutes);
 
 // ── 404 handler ────────────────────────────────
 app.use((_req, res) => {

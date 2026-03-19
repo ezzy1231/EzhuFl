@@ -12,17 +12,22 @@ import {
 } from "lucide-react";
 import { mockTestimonials } from "../../data/mockData";
 import { getAllCampaigns } from "../../services/campaign.service";
+import { getPublicStats, type PublicStats } from "../../services/stats.service";
 import { CampaignCard } from "../../components/CampaignCard";
 import type { Campaign } from "../../types";
 
 export function LandingPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [stats, setStats] = useState<PublicStats | null>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
     getAllCampaigns()
       .then((c) => setCampaigns(c))
       .catch(() => setCampaigns([]));
+    getPublicStats()
+      .then((s) => setStats(s))
+      .catch(() => setStats(null));
   }, []);
 
   const activeCampaigns = campaigns.filter((c) => c.status === "ACTIVE");
@@ -225,10 +230,10 @@ export function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
             {[
-              { label: t("landing.campaignsCreated"), value: "500+", icon: <Trophy size={20} /> },
-              { label: t("landing.activeCreators"), value: "10K+", icon: <Users size={20} /> },
-              { label: t("landing.totalPaidOut"), value: "$250K+", icon: <DollarSign size={20} /> },
-              { label: t("landing.avgEngagement"), value: "8.4%", icon: <TrendingUp size={20} /> },
+              { label: t("landing.campaignsCreated"), value: stats ? String(stats.totalCampaigns) : "—", icon: <Trophy size={20} /> },
+              { label: t("landing.activeCreators"), value: stats ? String(stats.activeCreators) : "—", icon: <Users size={20} /> },
+              { label: t("landing.totalPaidOut"), value: stats ? `$${stats.totalPaidOut.toLocaleString()}` : "—", icon: <DollarSign size={20} /> },
+              { label: t("landing.avgEngagement"), value: stats ? `${stats.avgEngagementRate}%` : "—", icon: <TrendingUp size={20} /> },
             ].map((stat) => (
               <div key={stat.label} className="card rounded-xl p-6 text-center">
                 <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 text-brand">

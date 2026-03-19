@@ -19,8 +19,8 @@ import { getLeaderboard } from "../controllers/leaderboard.controller.js";
 
 const router = Router();
 
-// Public-ish (still needs auth) — list / details
-router.get("/", authMiddleware, getAllCampaigns);
+// Public — list all campaigns (no auth needed for landing page)
+router.get("/", getAllCampaigns);
 
 // Business-only — my campaigns
 router.get("/my", authMiddleware, businessOnly, getMyCampaigns);
