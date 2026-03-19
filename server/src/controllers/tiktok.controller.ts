@@ -125,14 +125,15 @@ export async function tiktokCallback(
     const { access_token, open_id } = tokenData;
 
     // ── Fetch TikTok user info ──
+    // Only request fields covered by approved scopes:
+    //   user.info.basic  → open_id, display_name, avatar_url
+    //   user.info.profile → username, bio_description
     const fields = [
       "open_id",
       "display_name",
       "avatar_url",
       "username",
       "bio_description",
-      "is_verified",
-      "follower_count",
     ].join(",");
 
     const userInfoRes = await fetch(
@@ -143,10 +144,11 @@ export async function tiktokCallback(
     );
 
     const userInfoData = await userInfoRes.json();
+    console.log("TikTok user info response:", JSON.stringify(userInfoData));
     const tiktokUser = userInfoData?.data?.user;
 
     if (!tiktokUser) {
-      console.error("TikTok user info fetch failed:", userInfoData);
+      console.error("TikTok user info fetch failed:", JSON.stringify(userInfoData));
       res.redirect(
         `${clientUrl}/login?error=${encodeURIComponent("Failed to fetch TikTok profile")}`
       );
