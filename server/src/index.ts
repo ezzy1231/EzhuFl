@@ -37,6 +37,11 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// ── TikTok domain verification ─────────────────
+app.get("/tiktokTGgQ9chnnY11Cg3JH6cGpwtb2wyhf9dO.txt", (_req, res) => {
+  res.type("text/plain").send("tiktok-developers-site-verification=TGgQ9chnnY11Cg3JH6cGpwtb2wyhf9dO");
+});
+
 // ── API Routes ─────────────────────────────────
 app.use("/api/auth", tiktokRoutes); // TikTok OAuth (public, before auth middleware)
 app.use("/api/auth", authRoutes);
