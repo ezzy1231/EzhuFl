@@ -7,8 +7,15 @@ import {
   getAllCampaigns,
   getLeaderboard,
   getCampaignById,
+  refreshCampaignMetrics,
 } from "../../services/campaign.service";
 import type { Campaign, LeaderboardEntry } from "../../types";
+
+function formatNum(n: number) {
+  if (n >= 10000) return `${(n / 1000).toFixed(0)}K`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return n.toLocaleString();
+}
 
 export function SharedLeaderboardPage() {
   const { id } = useParams();
@@ -20,8 +27,9 @@ export function SharedLeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [lbLoading, setLbLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [brokenPhotos, setBrokenPhotos] = useState<Record<string, boolean>>({});
 
-  // If an :id is in the URL, load that campaign's leaderboard directly
   useEffect(() => {
     if (id) {
       setLoading(true);
@@ -50,6 +58,17 @@ export function SharedLeaderboardPage() {
       .finally(() => setLbLoading(false));
   }
 
+  async function handleRefresh() {
+    if (!selectedCampaign) return;
+    setRefreshing(true);
+    try {
+      await refreshCampaignMetrics(selectedCampaign.id);
+      const lb = await getLeaderboard(selectedCampaign.id).catch(() => []);
+      setLeaderboard(lb);
+    } catch {}
+    setRefreshing(false);
+  }
+
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -58,7 +77,7 @@ export function SharedLeaderboardPage() {
     );
   }
 
-  // ── Campaign list view (no id param, nothing selected) ──
+  // ── Campaign list view ──
   if (!id && !selectedCampaign) {
     return (
       <div>
@@ -115,7 +134,7 @@ export function SharedLeaderboardPage() {
     );
   }
 
-  // ── Single campaign leaderboard view ──
+  // ── Campaign not found ──
   if (!selectedCampaign) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -137,133 +156,75 @@ export function SharedLeaderboardPage() {
     );
   }
 
-  const topThree = leaderboard.slice(0, 3);
-
+  // ── Single campaign leaderboard ──
   return (
     <div>
-      <button
-        onClick={() => {
-          setSelectedCampaign(null);
-          setLeaderboard([]);
-          if (!campaigns.length) {
-            setLoading(true);
-            getAllCampaigns()
-              .then((c) => setCampaigns(c.filter((x) => x.status === "ACTIVE" || x.status === "COMPLETED")))
-              .finally(() => setLoading(false));
-          }
-        }}
-        className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
-      >
-        <ArrowLeft size={14} /> Back to Campaigns
-      </button>
+      {!id && (
+        <button
+          onClick={() => {
+            setSelectedCampaign(null);
+            setLeaderboard([]);
+            if (!campaigns.length) {
+              setLoading(true);
+              getAllCampaigns()
+                .then((c) => setCampaigns(c.filter((x) => x.status === "ACTIVE" || x.status === "COMPLETED")))
+                .finally(() => setLoading(false));
+            }
+          }}
+          className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
+        >
+          <ArrowLeft size={14} /> Back to Campaigns
+        </button>
+      )}
 
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Leaderboard
-        </h1>
-        <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          {selectedCampaign.title}
-        </p>
-      </div>
-
-      {leaderboard.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center rounded-xl py-16 text-center">
-          <Trophy size={48} className="mb-3 text-brand/40" />
-          <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-            No submissions yet
-          </p>
-          <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
-            The leaderboard will populate once creators submit videos.
-          </p>
-        </div>
-      ) : (
-        <>
-          {/* Podium */}
-          <div className="card mb-8 rounded-xl p-8">
-            <div className="flex items-end justify-center gap-4 sm:gap-8">
-              {/* 2nd place */}
-              {topThree[1] && (
-                <div className="flex flex-col items-center">
-                  <div
-                    className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold"
-                    style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-primary)" }}
-                  >
-                    {topThree[1].user_name.charAt(0)}
-                  </div>
-                  <p className="mt-2 text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                    {topThree[1].user_name}
-                  </p>
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    {topThree[1].score.toLocaleString()} pts
-                  </p>
-                  <div className="mt-3 flex h-28 w-24 flex-col items-center justify-end rounded-t-xl bg-gray-400/15 pb-3">
-                    <span className="text-2xl font-bold text-gray-400">2</span>
-                  </div>
-                </div>
-              )}
-
-              {/* 1st place */}
-              {topThree[0] && (
-                <div className="flex flex-col items-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand/20 text-xl font-bold text-brand">
-                    {topThree[0].user_name.charAt(0)}
-                  </div>
-                  <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-                    {topThree[0].user_name}
-                  </p>
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    {topThree[0].score.toLocaleString()} pts
-                  </p>
-                  <div className="mt-3 flex h-36 w-28 flex-col items-center justify-end rounded-t-xl bg-brand/15 pb-3">
-                    <Trophy size={28} className="mb-1 text-brand" />
-                    <span className="text-2xl font-bold text-brand">1</span>
-                  </div>
-                </div>
-              )}
-
-              {/* 3rd place */}
-              {topThree[2] && (
-                <div className="flex flex-col items-center">
-                  <div
-                    className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold"
-                    style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-primary)" }}
-                  >
-                    {topThree[2].user_name.charAt(0)}
-                  </div>
-                  <p className="mt-2 text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                    {topThree[2].user_name}
-                  </p>
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    {topThree[2].score.toLocaleString()} pts
-                  </p>
-                  <div className="mt-3 flex h-20 w-24 flex-col items-center justify-end rounded-t-xl bg-amber-500/15 pb-3">
-                    <span className="text-2xl font-bold text-amber-500">3</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Full Rankings Table */}
-          <div className="card rounded-xl p-6">
-            <h2 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-              Full Rankings
+      <div className="card rounded-xl p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
+              Live Leaderboard
             </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b" style={{ borderColor: "var(--border-primary)" }}>
-                    <th className="pb-3 text-left font-medium" style={{ color: "var(--text-muted)" }}>Rank</th>
-                    <th className="pb-3 text-left font-medium" style={{ color: "var(--text-muted)" }}>Creator</th>
-                    <th className="pb-3 text-left font-medium" style={{ color: "var(--text-muted)" }}>Views</th>
-                    <th className="pb-3 text-left font-medium" style={{ color: "var(--text-muted)" }}>Likes</th>
-                    <th className="pb-3 text-left font-medium" style={{ color: "var(--text-muted)" }}>Comments</th>
-                    <th className="pb-3 text-right font-medium" style={{ color: "var(--text-muted)" }}>Score</th>
-                    <th className="pb-3 text-right font-medium" style={{ color: "var(--text-muted)" }}>Video</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leaderboard.map((entry) => (
+            <p className="mt-0.5 text-sm" style={{ color: "var(--text-secondary)" }}>
+              {selectedCampaign.title}
+            </p>
+          </div>
+          {leaderboard.length > 0 && (
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-brand/10 disabled:opacity-50"
+              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
+            >
+              {refreshing ? "Refreshing..." : "↻ Refresh Stats"}
+            </button>
+          )}
+        </div>
+
+        {leaderboard.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              No submissions yet.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left" style={{ borderColor: "var(--border-primary)" }}>
+                  <th className="pb-3 font-medium" style={{ color: "var(--text-muted)" }}>#</th>
+                  <th className="pb-3 font-medium" style={{ color: "var(--text-muted)" }}>Creator</th>
+                  <th className="pb-3 font-medium" style={{ color: "var(--text-muted)" }}>Views</th>
+                  <th className="pb-3 font-medium" style={{ color: "var(--text-muted)" }}>Likes</th>
+                  <th className="pb-3 font-medium" style={{ color: "var(--text-muted)" }}>Comments</th>
+                  <th className="pb-3 text-right font-medium" style={{ color: "var(--text-muted)" }}>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leaderboard.map((entry) => {
+                  const fallbackUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/profiles/${entry.user_id}/photo.jpg`;
+                  const photoUrl = entry.user_profile_photo_url || fallbackUrl;
+                  const photoBroken = !!brokenPhotos[entry.user_id];
+
+                  return (
                     <tr
                       key={entry.rank}
                       className="border-b last:border-0"
@@ -285,14 +246,41 @@ export function SharedLeaderboardPage() {
                           {entry.rank}
                         </span>
                       </td>
-                      <td className="py-3 font-medium" style={{ color: "var(--text-primary)" }}>
-                        {entry.user_name}
+                      <td className="py-3">
+                        <div className="flex items-center gap-2">
+                          {photoUrl && !photoBroken ? (
+                            <img
+                              src={photoUrl}
+                              alt={entry.user_name}
+                              className="h-7 w-7 rounded-full object-cover"
+                              onError={() => setBrokenPhotos((prev) => ({ ...prev, [entry.user_id]: true }))}
+                            />
+                          ) : (
+                            <span
+                              className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold"
+                              style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-secondary)" }}
+                            >
+                              {entry.user_name?.charAt(0).toUpperCase() || "?"}
+                            </span>
+                          )}
+                          <span className="font-medium" style={{ color: "var(--text-primary)" }}>
+                            {entry.user_name}
+                          </span>
+                          <a
+                            href={entry.video_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-brand hover:underline"
+                          >
+                            <ExternalLink size={12} />
+                          </a>
+                        </div>
                       </td>
                       <td className="py-3" style={{ color: "var(--text-secondary)" }}>
-                        {(entry.views / 1000).toFixed(0)}K
+                        {formatNum(entry.views)}
                       </td>
                       <td className="py-3" style={{ color: "var(--text-secondary)" }}>
-                        {(entry.likes / 1000).toFixed(1)}K
+                        {formatNum(entry.likes)}
                       </td>
                       <td className="py-3" style={{ color: "var(--text-secondary)" }}>
                         {entry.comments.toLocaleString()}
@@ -300,24 +288,14 @@ export function SharedLeaderboardPage() {
                       <td className="py-3 text-right font-semibold" style={{ color: "var(--text-primary)" }}>
                         {entry.score.toLocaleString()}
                       </td>
-                      <td className="py-3 text-right">
-                        <a
-                          href={entry.video_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-brand hover:underline"
-                        >
-                          Watch <ExternalLink size={12} />
-                        </a>
-                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
