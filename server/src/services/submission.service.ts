@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabase.js";
+00import { supabase } from "../config/supabase.js";
 import { calculateScore } from "../utils/score.js";
 import { fetchVideoMetrics } from "./social-media.service.js";
 import type { DbSubmission, CreateSubmissionDto } from "../types/index.js";

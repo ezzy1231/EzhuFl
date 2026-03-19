@@ -1,6 +1,14 @@
 {
+  "cleanUrls": false,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/tiktok:file*",
+      "destination": "/tiktok:file*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
