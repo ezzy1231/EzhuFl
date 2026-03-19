@@ -98,7 +98,10 @@ body {
   border: 1px solid var(--border-primary);
   color: var(--text-primary);
   border-radius: 0.5rem;
-  padding: 0.625rem 0.875rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
   font-size: 0.875rem;
   transition: border-color 0.15s ease;
 }

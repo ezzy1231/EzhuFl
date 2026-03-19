@@ -142,7 +142,7 @@ export function BusinessProfilePage() {
     verificationStatus === "rejected";
 
   return (
-    <div>
+    <div className="min-w-0 overflow-x-hidden">
       <div className="mb-8">
         <h1
           className="text-2xl font-bold"
@@ -214,9 +214,9 @@ export function BusinessProfilePage() {
               className="flex items-center gap-3 rounded-lg p-3"
               style={{ backgroundColor: "var(--bg-secondary)" }}
             >
-              <Mail size={16} style={{ color: "var(--text-muted)" }} />
+              <Mail size={16} className="shrink-0" style={{ color: "var(--text-muted)" }} />
               <span
-                className="text-sm"
+                className="min-w-0 truncate text-sm"
                 style={{ color: "var(--text-primary)" }}
               >
                 {user?.email}
