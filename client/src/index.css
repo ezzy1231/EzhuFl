@@ -81,35 +81,37 @@ body {
 }
 
 /* ── Utility classes for themed elements ── */
-.card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-primary);
-  border-radius: 0.75rem;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-brand);
-}
+@layer components {
+  .card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-brand);
+  }
 
-.input-field {
-  background-color: var(--bg-input);
-  border: 1px solid var(--border-primary);
-  color: var(--text-primary);
-  border-radius: 0.5rem;
-  padding-top: 0.625rem;
-  padding-bottom: 0.625rem;
-  padding-left: 0.875rem;
-  padding-right: 0.875rem;
-  font-size: 0.875rem;
-  transition: border-color 0.15s ease;
-}
-.input-field::placeholder { color: var(--text-tertiary); }
-.input-field:focus {
-  outline: none;
-  border-color: var(--color-brand);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  .input-field {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    border-radius: 0.5rem;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+    font-size: 0.875rem;
+    transition: border-color 0.15s ease;
+  }
+  .input-field::placeholder { color: var(--text-tertiary); }
+  .input-field:focus {
+    outline: none;
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  }
 }
 
 /* ── Animations ── */
