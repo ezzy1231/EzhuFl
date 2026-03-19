@@ -423,16 +423,18 @@ export function BusinessProfilePage() {
                 >
                   Phone *
                 </label>
-                <div className="relative">
-                  <Phone
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2"
+                <div className="relative flex">
+                  <span
+                    className="input-field flex items-center gap-1.5 rounded-r-none border-r-0 px-3 text-sm"
                     style={{ color: "var(--text-muted)" }}
-                  />
+                  >
+                    <Phone size={16} />
+                    +251
+                  </span>
                   <input
                     type="tel"
-                    className="input-field w-full pl-10"
-                    placeholder="+964 xxx xxx xxxx"
+                    className="input-field w-full rounded-l-none"
+                    placeholder="9xx xxx xxxx"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
@@ -453,15 +455,22 @@ export function BusinessProfilePage() {
                     className="absolute left-3 top-1/2 -translate-y-1/2"
                     style={{ color: "var(--text-muted)" }}
                   />
-                  <input
-                    type="text"
-                    className="input-field w-full pl-10"
-                    placeholder="e.g. Baghdad"
+                  <select
+                    className="input-field w-full pl-10 appearance-none"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     required
                     disabled={!isEditable}
-                  />
+                  >
+                    <option value="">Select a city</option>
+                    <option value="Addis Ababa">Addis Ababa</option>
+                    <option value="Awassa">Awassa</option>
+                    <option value="Dire Dawa">Dire Dawa</option>
+                    <option value="Mekelle">Mekelle</option>
+                    <option value="Adama">Adama</option>
+                    <option value="Bahir Dar">Bahir Dar</option>
+                    <option value="Gonder">Gonder</option>
+                  </select>
                 </div>
               </div>
             </div>
