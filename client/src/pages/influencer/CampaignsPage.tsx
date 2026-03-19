@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { CampaignCard } from "../../components/CampaignCard";
 import { Spinner } from "../../components/Spinner";
+import { useTranslation } from "react-i18next";
 import type { Campaign } from "../../types";
 import { Search } from "lucide-react";
 import { getAllCampaigns } from "../../services/campaign.service";
@@ -10,6 +11,7 @@ export function CampaignsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     getAllCampaigns()
@@ -30,10 +32,10 @@ export function CampaignsPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Campaigns
+          {t("campaignsPage.title")}
         </h1>
         <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          Browse and join active campaigns
+          {t("campaignsPage.subtitle")}
         </p>
       </div>
 
@@ -49,7 +51,7 @@ export function CampaignsPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search campaigns..."
+            placeholder={t("campaignsPage.searchPlaceholder")}
             className="input-field w-full pl-10"
           />
         </div>
@@ -80,9 +82,9 @@ export function CampaignsPage() {
         <div
           className="card flex flex-col items-center justify-center rounded-xl py-20 text-center"
         >
-          <p style={{ color: "var(--text-secondary)" }}>No campaigns found</p>
+          <p style={{ color: "var(--text-secondary)" }}>{t("campaignsPage.noCampaigns")}</p>
           <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
-            Try adjusting your search or filters
+            {t("campaignsPage.tryAdjusting")}
           </p>
         </div>
       ) : (

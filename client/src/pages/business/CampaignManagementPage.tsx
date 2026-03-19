@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft, ExternalLink, Trophy, Users, DollarSign, Clock } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
 import { getCampaignById, getLeaderboard, refreshCampaignMetrics } from "../../services/campaign.service";
@@ -7,6 +8,7 @@ import type { Campaign, LeaderboardEntry } from "../../types";
 
 export function CampaignManagementPage() {
   const { id } = useParams();
+  const { t } = useTranslation();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,10 +40,10 @@ export function CampaignManagementPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          Campaign not found
+          {t("campaignManagement.campaignNotFound")}
         </p>
         <Link to="/business/campaigns" className="mt-4 text-sm text-brand hover:underline">
-          ← Back to Campaigns
+          ← {t("campaignManagement.backToCampaigns")}
         </Link>
       </div>
     );
@@ -53,7 +55,7 @@ export function CampaignManagementPage() {
         to="/business/campaigns"
         className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
       >
-        <ArrowLeft size={14} /> Back to Campaigns
+        <ArrowLeft size={14} /> {t("campaignManagement.backToCampaigns")}
       </Link>
 
       <div className="card mb-6 overflow-hidden rounded-xl">
@@ -97,28 +99,28 @@ export function CampaignManagementPage() {
             <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
               ${campaign.budget.toLocaleString()}
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Budget</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignManagement.budget")}</p>
           </div>
           <div className="rounded-lg p-3" style={{ backgroundColor: "var(--bg-secondary)" }}>
             <Trophy size={16} className="mb-1 text-amber-500" />
             <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
               {campaign.winners_count}
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Winners</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignManagement.winners")}</p>
           </div>
           <div className="rounded-lg p-3" style={{ backgroundColor: "var(--bg-secondary)" }}>
             <Clock size={16} className="mb-1 text-blue-400" />
             <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
               {campaign.duration_days}d
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Duration</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignManagement.duration")}</p>
           </div>
           <div className="rounded-lg p-3" style={{ backgroundColor: "var(--bg-secondary)" }}>
             <Users size={16} className="mb-1 text-emerald-500" />
             <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
               {leaderboard.length}
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Participants</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignManagement.participants")}</p>
           </div>
         </div>
         </div>
@@ -128,7 +130,7 @@ export function CampaignManagementPage() {
       <div className="card rounded-xl p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-            Submissions & Leaderboard
+            {t("campaignManagement.submissionsLeaderboard")}
           </h2>
           {leaderboard.length > 0 && (
             <button
@@ -146,7 +148,7 @@ export function CampaignManagementPage() {
               className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-brand/10 disabled:opacity-50"
               style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
             >
-              {refreshing ? "Refreshing..." : "↻ Refresh Stats"}
+              {refreshing ? t("campaignManagement.refreshing") : t("campaignManagement.refreshStats")}
             </button>
           )}
         </div>

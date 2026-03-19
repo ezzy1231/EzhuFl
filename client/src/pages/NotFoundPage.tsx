@@ -1,7 +1,10 @@
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Trophy, Home, ArrowLeft } from "lucide-react";
 
 export function NotFoundPage() {
+  const { t } = useTranslation();
+
   return (
     <div
       className="flex min-h-screen flex-col items-center justify-center px-4 text-center"
@@ -10,7 +13,7 @@ export function NotFoundPage() {
       <div className="mb-6 flex items-center gap-2">
         <Trophy size={32} className="text-brand" />
         <span className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
-          CreatorPay
+          {t("common.brand")}
         </span>
       </div>
 
@@ -18,20 +21,19 @@ export function NotFoundPage() {
         className="mb-2 text-7xl font-extrabold tracking-tight"
         style={{ color: "var(--text-primary)" }}
       >
-        404
+        {t("notFound.title")}
       </h1>
       <p
         className="mb-2 text-xl font-semibold"
         style={{ color: "var(--text-secondary)" }}
       >
-        Page not found
+        {t("notFound.subtitle")}
       </p>
       <p
         className="mb-8 max-w-md text-sm"
         style={{ color: "var(--text-muted)" }}
       >
-        The page you&apos;re looking for doesn&apos;t exist or has been moved.
-        Let&apos;s get you back on track.
+        {t("notFound.text")}
       </p>
 
       <div className="flex gap-3">
@@ -39,7 +41,7 @@ export function NotFoundPage() {
           to="/"
           className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
         >
-          <Home size={16} /> Go Home
+          <Home size={16} /> {t("notFound.goHome")}
         </Link>
         <button
           onClick={() => window.history.back()}
@@ -50,7 +52,7 @@ export function NotFoundPage() {
             backgroundColor: "var(--bg-card)",
           }}
         >
-          <ArrowLeft size={16} /> Go Back
+          <ArrowLeft size={16} /> {t("notFound.goBack")}
         </button>
       </div>
     </div>

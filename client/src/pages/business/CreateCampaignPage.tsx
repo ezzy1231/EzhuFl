@@ -1,21 +1,25 @@
 import { useState, useRef, type FormEvent } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { createCampaign } from "../../services/campaign.service";
 import { uploadFile } from "../../services/profile.service";
 import { useAuth } from "../../hooks/useAuth";
 import { Spinner } from "../../components/Spinner";
 import { ImagePlus, X } from "lucide-react";
 
-const PLATFORM_OPTIONS = [
-  { value: "TIKTOK", label: "TikTok" },
-  { value: "INSTAGRAM", label: "Instagram" },
-  { value: "YOUTUBE", label: "YouTube" },
-  { value: "TWITTER", label: "X / Twitter" },
-];
+const PLATFORM_KEYS: Record<string, string> = {
+  TIKTOK: "createCampaign.tiktok",
+  INSTAGRAM: "createCampaign.instagram",
+  YOUTUBE: "createCampaign.youtube",
+  TWITTER: "createCampaign.twitter",
+};
+
+const PLATFORM_VALUES = ["TIKTOK", "INSTAGRAM", "YOUTUBE", "TWITTER"];
 
 export function CreateCampaignPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -39,7 +43,7 @@ export function CreateCampaignPage() {
       const url = await uploadFile("campaign-covers", path, file);
       setCoverImageUrl(url);
     } catch {
-      setError("Failed to upload cover image");
+      setError(t("createCampaign.failedUpload"));
     } finally {
       setUploading(false);
     }
@@ -70,7 +74,7 @@ export function CreateCampaignPage() {
       navigate(`/business/campaigns/${campaign.id}`);
     } catch (err: any) {
       setError(
-        err.response?.data?.error || err.message || "Failed to create campaign"
+        err.response?.data?.error || err.message || t("createCampaign.failedCreate")
       );
     } finally {
       setLoading(false);
@@ -91,10 +95,10 @@ export function CreateCampaignPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Create Campaign
+          {t("createCampaign.title")}
         </h1>
         <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          Set up a new performance-based creator campaign
+          {t("createCampaign.subtitle")}
         </p>
       </div>
 
@@ -110,7 +114,7 @@ export function CreateCampaignPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                  Campaign Title *
+                  {t("createCampaign.campaignTitle")}
                 </label>
                 <input
                   type="text"
@@ -124,7 +128,7 @@ export function CreateCampaignPage() {
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                  Description
+                  {t("createCampaign.description")}
                 </label>
                 <textarea
                   value={description}
@@ -138,7 +142,7 @@ export function CreateCampaignPage() {
               {/* Cover Image Upload */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                  Cover Image
+                  {t("createCampaign.coverImage")}
                 </label>
                 <input
                   ref={coverRef}
@@ -181,7 +185,7 @@ export function CreateCampaignPage() {
                     ) : (
                       <>
                         <ImagePlus size={20} />
-                        <span className="text-sm">Upload campaign cover image</span>
+                        <span className="text-sm">{t("createCampaign.uploadCover")}</span>
                       </>
                     )}
                   </button>
@@ -191,21 +195,21 @@ export function CreateCampaignPage() {
               {/* Target Platforms */}
               <div>
                 <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                  Target Platforms *
+                  {t("createCampaign.targetPlatforms")}
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {PLATFORM_OPTIONS.map((p) => (
+                  {PLATFORM_VALUES.map((pv) => (
                     <button
-                      key={p.value}
+                      key={pv}
                       type="button"
-                      onClick={() => togglePlatform(p.value)}
+                      onClick={() => togglePlatform(pv)}
                       className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
-                        platforms.includes(p.value)
+                        platforms.includes(pv)
                           ? "border-brand bg-brand/10 text-brand"
                           : ""
                       }`}
                       style={
-                        !platforms.includes(p.value)
+                        !platforms.includes(pv)
                           ? {
                               borderColor: "var(--border-primary)",
                               color: "var(--text-secondary)",
@@ -214,7 +218,7 @@ export function CreateCampaignPage() {
                           : undefined
                       }
                     >
-                      {p.label}
+                      {t(PLATFORM_KEYS[pv])}
                     </button>
                   ))}
                 </div>
@@ -222,7 +226,7 @@ export function CreateCampaignPage() {
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                  Prize Pool (USD) *
+                  {t("createCampaign.prizePool")}
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }}>
@@ -243,7 +247,7 @@ export function CreateCampaignPage() {
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                  Duration (Days) *
+                  {t("createCampaign.durationDays")}
                 </label>
                 <div className="flex gap-3">
                   {[1, 2, 3].map((d) => (
@@ -266,7 +270,7 @@ export function CreateCampaignPage() {
                           : undefined
                       }
                     >
-                      {d} Day{d > 1 ? "s" : ""}
+                      {d} {d > 1 ? t("createCampaign.days") : t("createCampaign.day")}
                     </button>
                   ))}
                 </div>
@@ -274,7 +278,7 @@ export function CreateCampaignPage() {
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                  Number of Winners (1-5) *
+                  {t("createCampaign.winnersCount")}
                 </label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((n) => (
@@ -309,7 +313,7 @@ export function CreateCampaignPage() {
                   disabled={loading}
                   className="flex items-center justify-center rounded-lg bg-brand px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
                 >
-                  {loading ? <Spinner size="sm" /> : "Create Campaign"}
+                  {loading ? <Spinner size="sm" /> : t("createCampaign.createCampaignBtn")}
                 </button>
                 <button
                   type="button"
@@ -317,7 +321,7 @@ export function CreateCampaignPage() {
                   className="card rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </button>
               </div>
             </form>
@@ -328,7 +332,7 @@ export function CreateCampaignPage() {
         <div className="lg:col-span-1">
           <div className="card sticky top-24 rounded-xl p-6">
             <h3 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-              Prize Distribution
+              {t("createCampaign.prizeDistribution")}
             </h3>
             {budgetNum > 0 ? (
               <div className="space-y-2">
@@ -339,7 +343,7 @@ export function CreateCampaignPage() {
                     style={{ backgroundColor: "var(--bg-secondary)" }}
                   >
                     <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                      {i === 0 ? "1st" : i === 1 ? "2nd" : i === 2 ? "3rd" : `${i + 1}th`} Place
+                      {i === 0 ? t("createCampaign.1stPlace") : i === 1 ? t("createCampaign.2ndPlace") : i === 2 ? t("createCampaign.3rdPlace") : t("createCampaign.nthPlace", { n: i + 1 })}
                     </span>
                     <span className="text-sm font-bold text-brand">
                       ${Math.round((budgetNum * pct) / 100).toLocaleString()}
@@ -350,13 +354,13 @@ export function CreateCampaignPage() {
                   className="mt-3 flex items-center justify-between border-t pt-3"
                   style={{ borderColor: "var(--border-primary)" }}
                 >
-                  <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>Total</span>
+                  <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{t("createCampaign.total")}</span>
                   <span className="text-lg font-bold text-brand">${budgetNum.toLocaleString()}</span>
                 </div>
               </div>
             ) : (
               <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                Enter a prize pool amount to see the distribution.
+                {t("createCampaign.prizeHint")}
               </p>
             )}
           </div>

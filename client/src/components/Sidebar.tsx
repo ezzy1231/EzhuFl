@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import type { BusinessProfile, InfluencerProfile } from "../types";
 import {
   LayoutDashboard,
@@ -20,32 +21,33 @@ interface SidebarLink {
   icon: React.ReactNode;
 }
 
-const influencerLinks: SidebarLink[] = [
-  { to: "/influencer/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-  { to: "/influencer/campaigns", label: "Campaigns", icon: <Trophy size={20} /> },
-  { to: "/influencer/my-campaigns", label: "My Campaigns", icon: <FolderOpen size={20} /> },
-  { to: "/influencer/leaderboard", label: "Leaderboard", icon: <BarChart3 size={20} /> },
-  { to: "/influencer/earnings", label: "Earnings", icon: <DollarSign size={20} /> },
-  { to: "/influencer/profile", label: "Profile", icon: <UserCircle size={20} /> },
-];
-
-const businessLinks: SidebarLink[] = [
-  { to: "/business/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-  { to: "/business/create", label: "Create Campaign", icon: <PlusCircle size={20} /> },
-  { to: "/business/campaigns", label: "My Campaigns", icon: <FolderOpen size={20} /> },
-  { to: "/business/leaderboard", label: "Leaderboard", icon: <BarChart3 size={20} /> },
-  { to: "/business/profile", label: "Profile", icon: <UserCircle size={20} /> },
-];
-
-const adminLinks: SidebarLink[] = [
-  { to: "/admin/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-  { to: "/admin/businesses", label: "Businesses", icon: <Building2 size={20} /> },
-  { to: "/admin/influencers", label: "Influencers", icon: <Users size={20} /> },
-];
-
 export function Sidebar() {
   const { user, signOut, extendedProfile } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const influencerLinks: SidebarLink[] = [
+    { to: "/influencer/dashboard", label: t("nav.dashboard"), icon: <LayoutDashboard size={20} /> },
+    { to: "/influencer/campaigns", label: t("nav.campaigns"), icon: <Trophy size={20} /> },
+    { to: "/influencer/my-campaigns", label: t("nav.myCampaigns"), icon: <FolderOpen size={20} /> },
+    { to: "/influencer/leaderboard", label: t("nav.leaderboard"), icon: <BarChart3 size={20} /> },
+    { to: "/influencer/earnings", label: t("nav.earnings"), icon: <DollarSign size={20} /> },
+    { to: "/influencer/profile", label: t("nav.profile"), icon: <UserCircle size={20} /> },
+  ];
+
+  const businessLinks: SidebarLink[] = [
+    { to: "/business/dashboard", label: t("nav.dashboard"), icon: <LayoutDashboard size={20} /> },
+    { to: "/business/create", label: t("nav.createCampaign"), icon: <PlusCircle size={20} /> },
+    { to: "/business/campaigns", label: t("nav.myCampaigns"), icon: <FolderOpen size={20} /> },
+    { to: "/business/leaderboard", label: t("nav.leaderboard"), icon: <BarChart3 size={20} /> },
+    { to: "/business/profile", label: t("nav.profile"), icon: <UserCircle size={20} /> },
+  ];
+
+  const adminLinks: SidebarLink[] = [
+    { to: "/admin/dashboard", label: t("nav.dashboard"), icon: <LayoutDashboard size={20} /> },
+    { to: "/admin/businesses", label: t("nav.businesses"), icon: <Building2 size={20} /> },
+    { to: "/admin/influencers", label: t("nav.influencers"), icon: <Users size={20} /> },
+  ];
 
   // Resolve profile photo URL
   const profilePhotoUrl =
@@ -86,7 +88,7 @@ export function Sidebar() {
           <Trophy size={16} className="text-white" />
         </div>
         <span className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
-          CreatorPay
+          {t("common.brand")}
         </span>
       </div>
 
@@ -128,7 +130,7 @@ export function Sidebar() {
               {user?.name || "User"}
             </p>
             <p className="truncate text-xs" style={{ color: "var(--text-muted)" }}>
-              {user?.role === "ADMIN" ? "Admin" : user?.role === "BUSINESS" ? "Business" : "Creator"}
+              {user?.role === "ADMIN" ? t("common.admin") : user?.role === "BUSINESS" ? t("common.business") : t("common.creator")}
             </p>
           </div>
         </div>
@@ -138,7 +140,7 @@ export function Sidebar() {
           style={{ color: "var(--text-secondary)" }}
         >
           <LogOut size={16} />
-          Sign Out
+          {t("common.signOut")}
         </button>
       </div>
     </aside>

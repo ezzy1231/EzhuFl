@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { CampaignCard } from "../../components/CampaignCard";
 import { Spinner } from "../../components/Spinner";
+import { useTranslation } from "react-i18next";
 import { PlusCircle } from "lucide-react";
 import { getMyCampaigns } from "../../services/campaign.service";
 import type { Campaign } from "../../types";
@@ -10,6 +11,7 @@ export function BusinessMyCampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     getMyCampaigns()
@@ -37,10 +39,10 @@ export function BusinessMyCampaignsPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-            My Campaigns
+            {t("businessMyCampaigns.title")}
           </h1>
           <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-            Manage your created campaigns
+            {t("businessMyCampaigns.subtitle")}
           </p>
         </div>
         <Link
@@ -48,7 +50,7 @@ export function BusinessMyCampaignsPage() {
           className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-hover"
         >
           <PlusCircle size={16} />
-          New Campaign
+          {t("businessMyCampaigns.newCampaign")}
         </Link>
       </div>
 
@@ -63,18 +65,17 @@ export function BusinessMyCampaignsPage() {
             <PlusCircle size={32} className="text-brand" />
           </div>
           <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-            No Campaigns Yet
+            {t("businessMyCampaigns.noCampaignsTitle")}
           </h2>
           <p className="mt-2 max-w-md text-sm" style={{ color: "var(--text-secondary)" }}>
-            Create your first campaign and start getting amazing content from
-            creators.
+            {t("businessMyCampaigns.noCampaignsText")}
           </p>
           <Link
             to="/business/create"
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-hover"
           >
             <PlusCircle size={16} />
-            Create Campaign
+            {t("businessMyCampaigns.createCampaign")}
           </Link>
         </div>
       ) : (

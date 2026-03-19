@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { FolderOpen } from "lucide-react";
 import { CampaignCard } from "../../components/CampaignCard";
 import { Spinner } from "../../components/Spinner";
+import { useTranslation } from "react-i18next";
 import { getMyJoinedCampaigns } from "../../services/campaign.service";
 import type { Campaign } from "../../types";
 
 export function MyCampaignsPage() {
   const [myCampaigns, setMyCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     getMyJoinedCampaigns()
@@ -28,10 +30,10 @@ export function MyCampaignsPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          My Campaigns
+          {t("myCampaignsPage.title")}
         </h1>
         <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          Campaigns you've joined and your submissions
+          {t("myCampaignsPage.subtitle")}
         </p>
       </div>
 
@@ -41,11 +43,10 @@ export function MyCampaignsPage() {
             <FolderOpen size={32} className="text-brand" />
           </div>
           <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-            No Campaigns Yet
+            {t("myCampaignsPage.noCampaignsTitle")}
           </h2>
           <p className="mt-2 max-w-md text-sm" style={{ color: "var(--text-secondary)" }}>
-            Campaigns you join will appear here. Browse available campaigns to
-            get started.
+            {t("myCampaignsPage.noCampaignsText")}
           </p>
         </div>
       ) : (

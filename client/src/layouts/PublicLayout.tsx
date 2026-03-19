@@ -1,8 +1,12 @@
 import { Outlet, Link } from "react-router";
 import { Trophy } from "lucide-react";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { LanguageToggle } from "../components/LanguageToggle";
+import { useTranslation } from "react-i18next";
 
 export function PublicLayout() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "var(--bg-secondary)" }}>
       {/* Header */}
@@ -27,19 +31,20 @@ export function PublicLayout() {
           </Link>
 
           <nav className="flex items-center gap-3">
+            <LanguageToggle />
             <ThemeToggle />
             <Link
               to="/login"
               className="text-sm font-medium transition-colors hover:opacity-80"
               style={{ color: "var(--text-secondary)" }}
             >
-              Log In
+              {t("publicLayout.logIn")}
             </Link>
             <Link
               to="/signup"
               className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover"
             >
-              Get Started
+              {t("publicLayout.getStarted")}
             </Link>
           </nav>
         </div>

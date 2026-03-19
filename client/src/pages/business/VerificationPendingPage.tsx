@@ -1,8 +1,10 @@
 import { Clock, RefreshCw } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 
 export function VerificationPendingPage() {
   const { refreshProfile, signOut } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -25,9 +27,7 @@ export function VerificationPendingPage() {
           className="mb-6 text-sm leading-relaxed"
           style={{ color: "var(--text-secondary)" }}
         >
-          Your business account is currently being reviewed by our team. This
-          usually takes 1–2 business days. You'll get access to the platform
-          once your account is approved.
+          {t("verificationPending.text")}
         </p>
 
         <div
@@ -44,9 +44,9 @@ export function VerificationPendingPage() {
             className="mt-2 space-y-1 text-left text-xs"
             style={{ color: "var(--text-secondary)" }}
           >
-            <li>✓ Business name and details</li>
-            <li>✓ Valid business license</li>
-            <li>✓ Contact information</li>
+            <li>{t("verificationPending.check1")}</li>
+            <li>{t("verificationPending.check2")}</li>
+            <li>{t("verificationPending.check3")}</li>
           </ul>
         </div>
 
@@ -56,7 +56,7 @@ export function VerificationPendingPage() {
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-hover"
           >
             <RefreshCw size={16} />
-            Check Status
+            {t("verificationPending.checkStatus")}
           </button>
           <button
             onClick={signOut}
@@ -66,7 +66,7 @@ export function VerificationPendingPage() {
               color: "var(--text-secondary)",
             }}
           >
-            Sign Out
+            {t("common.signOut")}
           </button>
         </div>
       </div>

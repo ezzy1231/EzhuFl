@@ -2,11 +2,14 @@ import { Outlet } from "react-router";
 import { Sidebar } from "../components/Sidebar";
 import { MobileNav } from "../components/MobileNav";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { LanguageToggle } from "../components/LanguageToggle";
 import { useAuth } from "../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import type { BusinessProfile, InfluencerProfile } from "../types";
 
 export function AuthLayout() {
   const { user, extendedProfile } = useAuth();
+  const { t } = useTranslation();
 
   // Resolve profile photo URL
   const profilePhotoUrl =
@@ -38,10 +41,11 @@ export function AuthLayout() {
               className="text-sm font-medium"
               style={{ color: "var(--text-secondary)" }}
             >
-              {user?.role === "ADMIN" ? "Admin Panel" : user?.role === "BUSINESS" ? "Business Dashboard" : "Creator Dashboard"}
+              {user?.role === "ADMIN" ? t("layout.adminPanel") : user?.role === "BUSINESS" ? t("layout.businessDashboard") : t("layout.creatorDashboard")}
             </h2>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <ThemeToggle />
             <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-brand/20 text-xs font-bold text-brand">
               {profilePhotoUrl ? (

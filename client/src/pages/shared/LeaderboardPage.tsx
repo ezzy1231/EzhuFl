@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Trophy, ArrowLeft, ExternalLink, BarChart3 } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
 import { useAuth } from "../../hooks/useAuth";
@@ -20,6 +21,7 @@ function formatNum(n: number) {
 export function SharedLeaderboardPage() {
   const { id } = useParams();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const prefix = user?.role === "BUSINESS" ? "/business" : "/influencer";
 
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -82,20 +84,20 @@ export function SharedLeaderboardPage() {
     return (
       <div>
         <h1 className="mb-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Live Leaderboard
+          {t("leaderboardPage.liveLeaderboard")}
         </h1>
         <p className="mb-6" style={{ color: "var(--text-secondary)" }}>
-          Select a campaign to view its leaderboard
+          {t("leaderboardPage.selectCampaign")}
         </p>
 
         {campaigns.length === 0 ? (
           <div className="card flex flex-col items-center justify-center rounded-xl py-16 text-center">
             <BarChart3 size={48} className="mb-3 text-brand/40" />
             <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-              No active campaigns
+              {t("leaderboardPage.noActiveCampaigns")}
             </p>
             <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
-              Leaderboards will appear here when campaigns are running.
+              {t("leaderboardPage.noActiveCampaignsText")}
             </p>
           </div>
         ) : (
@@ -124,7 +126,7 @@ export function SharedLeaderboardPage() {
                   {c.status === "COMPLETED" ? "Completed" : "Active"}
                 </p>
                 <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-brand">
-                  <Trophy size={14} /> View Leaderboard
+                  <Trophy size={14} /> {t("leaderboardPage.viewLeaderboard")}
                 </span>
               </button>
             ))}
@@ -139,10 +141,10 @@ export function SharedLeaderboardPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          Campaign not found
+          {t("leaderboardPage.campaignNotFound")}
         </p>
         <Link to={`${prefix}/leaderboard`} className="mt-4 text-sm text-brand hover:underline">
-          ← Back to Campaigns
+          ← {t("leaderboardPage.backToCampaigns")}
         </Link>
       </div>
     );
@@ -173,7 +175,7 @@ export function SharedLeaderboardPage() {
           }}
           className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
         >
-          <ArrowLeft size={14} /> Back to Campaigns
+          <ArrowLeft size={14} /> {t("leaderboardPage.backToCampaigns")}
         </button>
       )}
 
@@ -181,7 +183,7 @@ export function SharedLeaderboardPage() {
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-              Live Leaderboard
+              {t("leaderboardPage.liveLeaderboard")}
             </h2>
             <p className="mt-0.5 text-sm" style={{ color: "var(--text-secondary)" }}>
               {selectedCampaign.title}
@@ -194,7 +196,7 @@ export function SharedLeaderboardPage() {
               className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-brand/10 disabled:opacity-50"
               style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
             >
-              {refreshing ? "Refreshing..." : "↻ Refresh Stats"}
+              {refreshing ? t("leaderboardPage.refreshing") : t("leaderboardPage.refreshStats")}
             </button>
           )}
         </div>
@@ -202,7 +204,7 @@ export function SharedLeaderboardPage() {
         {leaderboard.length === 0 ? (
           <div className="py-8 text-center">
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              No submissions yet.
+              {t("leaderboardPage.noSubmissions")}
             </p>
           </div>
         ) : (

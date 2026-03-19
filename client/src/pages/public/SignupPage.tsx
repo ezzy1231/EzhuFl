@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import { Spinner } from "../../components/Spinner";
 import { Trophy } from "lucide-react";
 import type { UserRole } from "../../types";
@@ -27,6 +28,7 @@ function TikTokIcon({ className }: { className?: string }) {
 export function SignupPage() {
   const navigate = useNavigate();
   const { signUp, signInWithGoogle, signInWithTikTok } = useAuth();
+  const { t } = useTranslation();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -69,17 +71,16 @@ export function SignupPage() {
             <span className="text-2xl">✉️</span>
           </div>
           <h2 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
-            Check Your Email
+            {t("signup.checkEmail")}
           </h2>
           <p className="mt-3 text-sm" style={{ color: "var(--text-secondary)" }}>
-            We've sent a confirmation link to <strong>{email}</strong>. Please
-            check your inbox and confirm your email to get started.
+            {t("signup.confirmationSent")} <strong>{email}</strong>. {t("signup.confirmText")}
           </p>
           <Link
             to="/login"
             className="mt-6 inline-block text-sm font-medium text-brand hover:underline"
           >
-            Back to Login
+            {t("signup.backToLogin")}
           </Link>
         </div>
       </div>
@@ -99,10 +100,10 @@ export function SignupPage() {
               <Trophy size={24} className="text-white" />
             </div>
             <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-              Create Your Account
+              {t("signup.createAccount")}
             </h1>
             <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>
-              Join CreatorPay and start earning or promoting
+              {t("signup.joinSubtitle")}
             </p>
           </div>
 
@@ -119,7 +120,7 @@ export function SignupPage() {
                 className="mb-1.5 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                I am a...
+                {t("signup.iAmA")}
               </label>
               <div
                 className="flex rounded-lg border p-1"
@@ -142,7 +143,7 @@ export function SignupPage() {
                       : undefined
                   }
                 >
-                  Creator
+                  {t("common.creator")}
                 </button>
                 <button
                   type="button"
@@ -158,7 +159,7 @@ export function SignupPage() {
                       : undefined
                   }
                 >
-                  Business
+                  {t("common.business")}
                 </button>
               </div>
             </div>
@@ -168,7 +169,7 @@ export function SignupPage() {
                 className="mb-1.5 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                {role === "BUSINESS" ? "Business Name" : "Full Name"}
+                {role === "BUSINESS" ? t("signup.businessName") : t("signup.fullName")}
               </label>
               <input
                 type="text"
@@ -185,7 +186,7 @@ export function SignupPage() {
                 className="mb-1.5 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Email
+                {t("signup.email")}
               </label>
               <input
                 type="email"
@@ -202,7 +203,7 @@ export function SignupPage() {
                 className="mb-1.5 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Password
+                {t("signup.password")}
               </label>
               <input
                 type="password"
@@ -220,14 +221,14 @@ export function SignupPage() {
               disabled={loading}
               className="flex w-full items-center justify-center rounded-lg bg-brand py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
             >
-              {loading ? <Spinner size="sm" /> : "Create Account"}
+              {loading ? <Spinner size="sm" /> : t("signup.createAccountBtn")}
             </button>
           </form>
 
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1" style={{ backgroundColor: "var(--border-primary)" }} />
-            <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>OR</span>
+            <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("common.or")}</span>
             <div className="h-px flex-1" style={{ backgroundColor: "var(--border-primary)" }} />
           </div>
 
@@ -251,7 +252,7 @@ export function SignupPage() {
               backgroundColor: "var(--bg-secondary)",
             }}
           >
-            {googleLoading ? <Spinner size="sm" /> : <><GoogleIcon className="h-5 w-5" /> Continue with Google</>}
+            {googleLoading ? <Spinner size="sm" /> : <><GoogleIcon className="h-5 w-5" /> {t("signup.continueWithGoogle")}</>}
           </button>
 
           {/* TikTok Sign Up */}
@@ -269,13 +270,13 @@ export function SignupPage() {
               backgroundColor: "var(--bg-secondary)",
             }}
           >
-            {tiktokLoading ? <Spinner size="sm" /> : <><TikTokIcon className="h-5 w-5" /> Continue with TikTok</>}
+            {tiktokLoading ? <Spinner size="sm" /> : <><TikTokIcon className="h-5 w-5" /> {t("signup.continueWithTiktok")}</>}
           </button>
 
           <p className="mt-6 text-center text-sm" style={{ color: "var(--text-secondary)" }}>
-            Already have an account?{" "}
+            {t("signup.haveAccount")}{" "}
             <Link to="/login" className="font-medium text-brand hover:underline">
-              Sign In
+              {t("signup.signIn")}
             </Link>
           </p>
         </div>

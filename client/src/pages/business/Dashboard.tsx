@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import { DashboardCard } from "../../components/DashboardCard";
 import { CampaignCard } from "../../components/CampaignCard";
 import { Spinner } from "../../components/Spinner";
@@ -15,6 +16,7 @@ import type { Campaign } from "../../types";
 
 export function BusinessDashboard() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,34 +49,34 @@ export function BusinessDashboard() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Welcome back, {user?.name || "Business"} 👋
+          {t("businessDashboard.welcomeBack", { name: user?.name || "Business" })}
         </h1>
         <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          Here's an overview of your campaigns
+          {t("businessDashboard.subtitle")}
         </p>
       </div>
 
       <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
-          title="Active Campaigns"
+          title={t("businessDashboard.activeCampaigns")}
           value={activeCampaigns.length}
           icon={<Trophy size={20} />}
           color="brand"
         />
         <DashboardCard
-          title="Total Spent"
+          title={t("businessDashboard.totalSpent")}
           value={`$${totalSpent.toLocaleString()}`}
           icon={<DollarSign size={20} />}
           color="emerald"
         />
         <DashboardCard
-          title="Total Campaigns"
+          title={t("businessDashboard.totalCampaigns")}
           value={campaigns.length}
           icon={<Users size={20} />}
           color="amber"
         />
         <DashboardCard
-          title="Avg. Budget"
+          title={t("businessDashboard.avgBudget")}
           value={campaigns.length ? `$${Math.round(totalSpent / campaigns.length).toLocaleString()}` : "$0"}
           icon={<BarChart3 size={20} />}
           color="rose"
@@ -84,7 +86,7 @@ export function BusinessDashboard() {
       {/* Recent Campaigns */}
       <div className="card rounded-xl p-6">
         <h2 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          Recent Campaigns
+          {t("businessDashboard.recentCampaigns")}
         </h2>
         {error && (
           <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
@@ -97,7 +99,7 @@ export function BusinessDashboard() {
               <FolderOpen size={32} className="text-brand" />
             </div>
             <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              You haven't created any campaigns yet.
+              {t("businessDashboard.noCampaigns")}
             </p>
           </div>
         ) : (

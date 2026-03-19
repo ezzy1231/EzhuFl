@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import { Spinner } from "../../components/Spinner";
 import { Trophy } from "lucide-react";
 
@@ -26,6 +27,7 @@ function TikTokIcon({ className }: { className?: string }) {
 export function LoginPage() {
   const navigate = useNavigate();
   const { signIn, signInWithGoogle, signInWithTikTok, user } = useAuth();
+  const { t } = useTranslation();
 
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
@@ -89,10 +91,10 @@ export function LoginPage() {
               <Trophy size={24} className="text-white" />
             </div>
             <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-              Welcome Back
+              {t("login.welcomeBack")}
             </h1>
             <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>
-              Sign in to your CreatorPay account
+              {t("login.signInSubtitle")}
             </p>
           </div>
 
@@ -108,7 +110,7 @@ export function LoginPage() {
                 className="mb-1.5 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Email
+                {t("login.email")}
               </label>
               <input
                 type="email"
@@ -125,7 +127,7 @@ export function LoginPage() {
                 className="mb-1.5 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Password
+                {t("login.password")}
               </label>
               <input
                 type="password"
@@ -142,14 +144,14 @@ export function LoginPage() {
               disabled={loading}
               className="flex w-full items-center justify-center rounded-lg bg-brand py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
             >
-              {loading ? <Spinner size="sm" /> : "Sign In"}
+              {loading ? <Spinner size="sm" /> : t("login.signIn")}
             </button>
           </form>
 
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1" style={{ backgroundColor: "var(--border-primary)" }} />
-            <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>OR</span>
+            <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("common.or")}</span>
             <div className="h-px flex-1" style={{ backgroundColor: "var(--border-primary)" }} />
           </div>
 
@@ -164,7 +166,7 @@ export function LoginPage() {
               backgroundColor: "var(--bg-secondary)",
             }}
           >
-            {googleLoading ? <Spinner size="sm" /> : <><GoogleIcon className="h-5 w-5" /> Continue with Google</>}
+            {googleLoading ? <Spinner size="sm" /> : <><GoogleIcon className="h-5 w-5" /> {t("login.continueWithGoogle")}</>}
           </button>
 
           {/* TikTok Sign In */}
@@ -182,13 +184,13 @@ export function LoginPage() {
               backgroundColor: "var(--bg-secondary)",
             }}
           >
-            {tiktokLoading ? <Spinner size="sm" /> : <><TikTokIcon className="h-5 w-5" /> Continue with TikTok</>}
+            {tiktokLoading ? <Spinner size="sm" /> : <><TikTokIcon className="h-5 w-5" /> {t("login.continueWithTiktok")}</>}
           </button>
 
           <p className="mt-6 text-center text-sm" style={{ color: "var(--text-secondary)" }}>
-            Don't have an account?{" "}
+            {t("login.noAccount")}{" "}
             <Link to="/signup" className="font-medium text-brand hover:underline">
-              Sign Up
+              {t("login.signUp")}
             </Link>
           </p>
         </div>

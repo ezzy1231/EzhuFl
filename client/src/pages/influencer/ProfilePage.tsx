@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import { TrustBadge } from "../../components/VerifiedBadge";
 import {
   Mail,
@@ -24,6 +25,7 @@ import type { InfluencerProfile } from "../../types";
 export function InfluencerProfilePage() {
   const { user, verificationStatus, extendedProfile, refreshProfile } =
     useAuth();
+  const { t } = useTranslation();
   const ip = extendedProfile as InfluencerProfile | null;
 
   // Form state
@@ -80,7 +82,7 @@ export function InfluencerProfilePage() {
       const url = await uploadFile("profiles", path, file);
       setProfilePhotoUrl(url);
     } catch {
-      setMessage({ type: "error", text: "Failed to upload photo" });
+      setMessage({ type: "error", text: t("profilePage.failedUploadPhoto") });
     } finally {
       setUploadingPhoto(false);
     }
@@ -95,7 +97,7 @@ export function InfluencerProfilePage() {
       const url = await uploadFile("ids", path, file);
       setIdDocumentUrl(url);
     } catch {
-      setMessage({ type: "error", text: "Failed to upload ID document" });
+      setMessage({ type: "error", text: t("profilePage.failedUploadID") });
     } finally {
       setUploadingId(false);
     }
@@ -118,10 +120,10 @@ export function InfluencerProfilePage() {
         id_document_url: idDocumentUrl,
       });
       await refreshProfile();
-      setMessage({ type: "success", text: "Profile saved successfully!" });
+      setMessage({ type: "success", text: t("profilePage.profileSaved") });
       setEditing(false);
     } catch {
-      setMessage({ type: "error", text: "Failed to save profile" });
+      setMessage({ type: "error", text: t("profilePage.failedSave") });
     } finally {
       setSaving(false);
     }
@@ -130,11 +132,11 @@ export function InfluencerProfilePage() {
   const tierLabel = (status: string | null) => {
     switch (status) {
       case "verified":
-        return "Full verification — eligible for premium campaigns";
+        return t("profilePage.fullVerification");
       case "basic":
-        return "Basic tier — complete more info to level up";
+        return t("profilePage.basicTier");
       default:
-        return "Fill in your details to unlock verification tiers";
+        return t("profilePage.fillDetails");
     }
   };
 
@@ -145,7 +147,7 @@ export function InfluencerProfilePage() {
           className="text-2xl font-bold"
           style={{ color: "var(--text-primary)" }}
         >
-          Creator Profile
+          {t("profilePage.creatorProfile")}
         </h1>
         <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
           {tierLabel(verificationStatus)}
@@ -194,7 +196,7 @@ export function InfluencerProfilePage() {
               {displayName || user?.name}
             </h2>
             <span className="mt-1 inline-block rounded-full bg-brand/10 px-3 py-0.5 text-xs font-medium text-brand">
-              Creator
+              {t("common.creator")}
             </span>
             <div className="mt-2">
               <TrustBadge
@@ -231,10 +233,7 @@ export function InfluencerProfilePage() {
                 className="text-sm"
                 style={{ color: "var(--text-primary)" }}
               >
-                Joined{" "}
-                {user?.created_at
-                  ? new Date(user.created_at).toLocaleDateString()
-                  : "—"}
+                {t("profilePage.joined", { date: user?.created_at ? new Date(user.created_at).toLocaleDateString() : "—" })}
               </span>
             </div>
           </div>
@@ -250,15 +249,15 @@ export function InfluencerProfilePage() {
             <div className="space-y-1">
               {[
                 {
-                  label: "Display name & phone",
+                  label: t("profilePage.step1"),
                   done: !!(displayName && phone),
                 },
                 {
-                  label: "Social handle linked",
+                  label: t("profilePage.step2"),
                   done: !!(tiktokHandle || instagramHandle),
                 },
                 {
-                  label: "ID document uploaded",
+                  label: t("profilePage.step3"),
                   done: !!idDocumentUrl,
                 },
               ].map((step, i) => (
@@ -309,7 +308,7 @@ export function InfluencerProfilePage() {
                 style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
               >
                 <Pencil size={14} />
-                Edit Profile
+                {t("profilePage.editProfile")}
               </button>
             )}
           </div>
@@ -331,36 +330,36 @@ export function InfluencerProfilePage() {
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Display Name</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.displayName")}</p>
                   <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{displayName || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Phone</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.phone")}</p>
                   <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{phone || "—"}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>City</p>
+                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.city")}</p>
                 <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{city || "—"}</p>
               </div>
               <div>
-                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Bio</p>
+                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.bio")}</p>
                 <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{bio || "—"}</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>TikTok Handle</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.tiktokHandle")}</p>
                   <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{tiktokHandle || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Instagram Handle</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.instagramHandle")}</p>
                   <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{instagramHandle || "—"}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>ID Document</p>
+                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.idDocument")}</p>
                 <p className="mt-1 text-sm" style={{ color: idDocumentUrl ? "var(--text-primary)" : "var(--text-muted)" }}>
-                  {idDocumentUrl ? "✓ Uploaded" : "Not uploaded"}
+                  {idDocumentUrl ? t("profilePage.idUploaded") : t("profilePage.idNotUploaded")}
                 </p>
               </div>
             </div>
@@ -598,7 +597,7 @@ export function InfluencerProfilePage() {
                   style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
                 >
                   <X size={16} />
-                  Cancel
+                  {t("common.cancel")}
                 </button>
               )}
               <button
@@ -607,7 +606,7 @@ export function InfluencerProfilePage() {
                 className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
               >
                 <Save size={16} />
-                {saving ? "Saving…" : "Save Profile"}
+                {saving ? t("common.loading") : t("profilePage.saveProfile")}
               </button>
             </div>
           </form>

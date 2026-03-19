@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import { DashboardCard } from "../../components/DashboardCard";
 import { CampaignCard } from "../../components/CampaignCard";
 import { Spinner } from "../../components/Spinner";
@@ -15,6 +16,7 @@ import type { Campaign } from "../../types";
 
 export function InfluencerDashboard() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,35 +41,35 @@ export function InfluencerDashboard() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Welcome back, {user?.name || "Creator"} 👋
+          {t("influencerDashboard.welcomeBack", { name: user?.name || "Creator" })}
         </h1>
         <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          Here's what's happening with your campaigns
+          {t("influencerDashboard.subtitle")}
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
-          title="Total Earnings"
+          title={t("influencerDashboard.totalEarnings")}
           value="$0"
           icon={<DollarSign size={20} />}
           color="emerald"
         />
         <DashboardCard
-          title="Active Campaigns"
+          title={t("influencerDashboard.activeCampaigns")}
           value={activeCampaigns.length}
           icon={<Trophy size={20} />}
           color="brand"
         />
         <DashboardCard
-          title="Total Views"
+          title={t("influencerDashboard.totalViews")}
           value="0"
           icon={<Eye size={20} />}
           color="amber"
         />
         <DashboardCard
-          title="Win Rate"
+          title={t("influencerDashboard.winRate")}
           value="0%"
           icon={<TrendingUp size={20} />}
           color="rose"
@@ -77,7 +79,7 @@ export function InfluencerDashboard() {
       {/* Available Campaigns */}
       <div className="card rounded-xl p-6">
         <h2 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          Available Campaigns
+          {t("influencerDashboard.availableCampaigns")}
         </h2>
         {activeCampaigns.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -85,7 +87,7 @@ export function InfluencerDashboard() {
               <FolderOpen size={32} className="text-brand" />
             </div>
             <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              No active campaigns right now. Check back soon!
+              {t("influencerDashboard.noActiveCampaigns")}
             </p>
           </div>
         ) : (

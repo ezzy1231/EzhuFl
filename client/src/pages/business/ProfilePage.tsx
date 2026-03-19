@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import { TrustBadge } from "../../components/VerifiedBadge";
 import {
@@ -27,6 +28,7 @@ import type { BusinessProfile } from "../../types";
 export function BusinessProfilePage() {
   const { user, verificationStatus, extendedProfile, refreshProfile } =
     useAuth();
+  const { t } = useTranslation();
   const bp = extendedProfile as BusinessProfile | null;
 
   // Form state
@@ -83,7 +85,7 @@ export function BusinessProfilePage() {
       const url = await uploadFile("licenses", path, file);
       setLicenseFileUrl(url);
     } catch {
-      setMessage({ type: "error", text: "Failed to upload file" });
+      setMessage({ type: "error", text: t("profilePage.failedUpload") });
     } finally {
       setUploading(false);
     }
@@ -98,7 +100,7 @@ export function BusinessProfilePage() {
       const url = await uploadFile("profile-photos", path, file);
       setProfilePhotoUrl(url);
     } catch {
-      setMessage({ type: "error", text: "Failed to upload profile photo" });
+      setMessage({ type: "error", text: t("profilePage.failedUploadPhoto") });
     } finally {
       setUploadingPhoto(false);
     }
@@ -125,12 +127,12 @@ export function BusinessProfilePage() {
         type: "success",
         text:
           verificationStatus === "rejected"
-            ? "Profile resubmitted for verification!"
-            : "Profile saved successfully!",
+            ? t("profilePage.profileResubmitted")
+            : t("profilePage.profileSaved"),
       });
       setEditing(false);
     } catch {
-      setMessage({ type: "error", text: "Failed to save profile" });
+      setMessage({ type: "error", text: t("profilePage.failedSave") });
     } finally {
       setSaving(false);
     }
@@ -148,10 +150,10 @@ export function BusinessProfilePage() {
           className="text-2xl font-bold"
           style={{ color: "var(--text-primary)" }}
         >
-          Business Profile
+          {t("profilePage.businessProfile")}
         </h1>
         <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          Complete your profile to get verified
+          {t("profilePage.completeProfile")}
         </p>
       </div>
 
@@ -193,7 +195,7 @@ export function BusinessProfilePage() {
               {user?.name}
             </h2>
             <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-0.5 text-xs font-medium text-brand">
-              <Building2 size={12} /> Business
+              <Building2 size={12} /> {t("common.business")}
             </span>
             <div className="mt-2">
               <TrustBadge
@@ -246,10 +248,9 @@ export function BusinessProfilePage() {
                 <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 p-4 text-amber-600">
                   <Clock size={18} className="mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-sm font-semibold">Under Review</p>
+                    <p className="text-sm font-semibold">{t("profilePage.underReview")}</p>
                     <p className="mt-0.5 text-xs opacity-80">
-                      Our team is reviewing your documents. This usually takes
-                      1‑2 business days.
+                      {t("profilePage.underReviewText")}
                     </p>
                   </div>
                 </div>
@@ -258,9 +259,9 @@ export function BusinessProfilePage() {
                 <div className="flex items-start gap-2 rounded-lg bg-emerald-500/10 p-4 text-emerald-600">
                   <CheckCircle size={18} className="mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-sm font-semibold">Verified</p>
+                    <p className="text-sm font-semibold">{t("profilePage.verified")}</p>
                     <p className="mt-0.5 text-xs opacity-80">
-                      Your business is verified. You can create campaigns.
+                      {t("profilePage.verifiedText")}
                     </p>
                   </div>
                 </div>
@@ -269,10 +270,10 @@ export function BusinessProfilePage() {
                 <div className="flex items-start gap-2 rounded-lg bg-red-500/10 p-4 text-red-500">
                   <XCircle size={18} className="mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-sm font-semibold">Rejected</p>
+                    <p className="text-sm font-semibold">{t("profilePage.rejected")}</p>
                     <p className="mt-0.5 text-xs opacity-80">
                       {bp?.rejection_reason ||
-                        "Your verification was rejected. Please update your details and resubmit."}
+                        t("profilePage.rejectedText")}
                     </p>
                   </div>
                 </div>
@@ -281,9 +282,9 @@ export function BusinessProfilePage() {
                 <div className="flex items-start gap-2 rounded-lg bg-gray-500/10 p-4 text-gray-500">
                   <AlertTriangle size={18} className="mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-sm font-semibold">Suspended</p>
+                    <p className="text-sm font-semibold">{t("profilePage.suspended")}</p>
                     <p className="mt-0.5 text-xs opacity-80">
-                      Your account has been suspended. Contact support.
+                      {t("profilePage.suspendedText")}
                     </p>
                   </div>
                 </div>
@@ -299,7 +300,7 @@ export function BusinessProfilePage() {
               className="text-lg font-semibold"
               style={{ color: "var(--text-primary)" }}
             >
-              Business Details
+              {t("profilePage.businessDetails")}
             </h2>
             {!editing && isProfileComplete && isEditable && (
               <button
@@ -309,7 +310,7 @@ export function BusinessProfilePage() {
                 style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
               >
                 <Pencil size={14} />
-                Edit Profile
+                {t("profilePage.editProfile")}
               </button>
             )}
           </div>
@@ -331,37 +332,37 @@ export function BusinessProfilePage() {
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Business Name</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.businessNameLabel")}</p>
                   <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{businessName || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Owner Name</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.ownerName")}</p>
                   <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{ownerName || "—"}</p>
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Phone</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.phone")}</p>
                   <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{phone || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>City</p>
+                  <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.city")}</p>
                   <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{city || "—"}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Address</p>
+                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.address")}</p>
                 <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{address || "—"}</p>
               </div>
               <div>
-                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>License Number</p>
+                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.licenseNumber")}</p>
                 <p className="mt-1 text-sm" style={{ color: "var(--text-primary)" }}>{licenseNumber || "—"}</p>
               </div>
               <div>
-                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>License Document</p>
+                <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("profilePage.licenseDocument")}</p>
                 <p className="mt-1 text-sm" style={{ color: licenseFileUrl ? "var(--text-primary)" : "var(--text-muted)" }}>
                   {licenseFileUrl ? (
-                    <a href={licenseFileUrl} target="_blank" rel="noreferrer" className="text-brand underline">View uploaded document</a>
+                    <a href={licenseFileUrl} target="_blank" rel="noreferrer" className="text-brand underline">{t("profilePage.viewDocument")}</a>
                   ) : "Not uploaded"}
                 </p>
               </div>
@@ -376,7 +377,7 @@ export function BusinessProfilePage() {
                   className="mb-1 block text-sm font-medium"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Business Name *
+                  {t("profilePage.businessNameRequired")}
                 </label>
                 <div className="relative">
                   <Building2
@@ -400,7 +401,7 @@ export function BusinessProfilePage() {
                   className="mb-1 block text-sm font-medium"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Owner Name *
+                  {t("profilePage.ownerNameRequired")}
                 </label>
                 <input
                   type="text"
@@ -421,7 +422,7 @@ export function BusinessProfilePage() {
                   className="mb-1 block text-sm font-medium"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Phone *
+                  {t("profilePage.phoneRequired")}
                 </label>
                 <div className="relative flex">
                   <span
@@ -447,7 +448,7 @@ export function BusinessProfilePage() {
                   className="mb-1 block text-sm font-medium"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  City *
+                  {t("profilePage.cityRequired")}
                 </label>
                 <div className="relative">
                   <MapPin
@@ -462,7 +463,7 @@ export function BusinessProfilePage() {
                     required
                     disabled={!isEditable}
                   >
-                    <option value="">Select a city</option>
+                    <option value="">{t("profilePage.selectCity")}</option>
                     <option value="Addis Ababa">Addis Ababa</option>
                     <option value="Awassa">Awassa</option>
                     <option value="Dire Dawa">Dire Dawa</option>
@@ -481,12 +482,12 @@ export function BusinessProfilePage() {
                 className="mb-1 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Address
+                {t("profilePage.address")}
               </label>
               <input
                 type="text"
                 className="input-field w-full"
-                placeholder="Street address (optional)"
+                placeholder={t("profilePage.addressPlaceholder")}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 disabled={!isEditable}
@@ -499,7 +500,7 @@ export function BusinessProfilePage() {
                 className="mb-1 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Business License Number *
+                {t("profilePage.licenseNumberRequired")}
               </label>
               <div className="relative">
                 <FileText
@@ -525,7 +526,7 @@ export function BusinessProfilePage() {
                 className="mb-1 block text-sm font-medium"
                 style={{ color: "var(--text-secondary)" }}
               >
-                License Document
+                {t("profilePage.licenseDocument")}
               </label>
               {licenseFileUrl ? (
                 <div className="flex items-center gap-3">
@@ -535,7 +536,7 @@ export function BusinessProfilePage() {
                     rel="noreferrer"
                     className="text-sm text-brand underline"
                   >
-                    View uploaded document
+                    {t("profilePage.viewDocument")}
                   </a>
                   {isEditable && (
                     <button
@@ -546,7 +547,7 @@ export function BusinessProfilePage() {
                         if (fileRef.current) fileRef.current.value = "";
                       }}
                     >
-                      Remove
+                      {t("common.remove")}
                     </button>
                   )}
                 </div>
@@ -565,8 +566,8 @@ export function BusinessProfilePage() {
                     style={{ color: "var(--text-muted)" }}
                   >
                     {uploading
-                      ? "Uploading..."
-                      : "Click to upload license document (PDF, JPG, PNG)"}
+                      ? t("common.uploading")
+                      : t("profilePage.uploadLicense")}
                   </span>
                 </div>
               )}
@@ -607,7 +608,7 @@ export function BusinessProfilePage() {
                     style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
                   >
                     <X size={16} />
-                    Cancel
+                    {t("common.cancel")}
                   </button>
                 )}
                 <button
@@ -617,12 +618,12 @@ export function BusinessProfilePage() {
                 >
                   <Save size={16} />
                   {saving
-                    ? "Saving…"
+                    ? t("common.loading")
                     : verificationStatus === "rejected"
-                    ? "Resubmit for Verification"
+                    ? t("profilePage.resubmitVerification")
                     : verificationStatus === "pending"
-                    ? "Update & Resubmit"
-                    : "Save & Submit for Verification"}
+                    ? t("profilePage.updateResubmit")
+                    : t("profilePage.saveSubmitVerification")}
                 </button>
               </div>
             )}

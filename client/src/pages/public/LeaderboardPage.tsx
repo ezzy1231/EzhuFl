@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Trophy, ArrowLeft, ExternalLink } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
 import { getCampaignById, getLeaderboard } from "../../services/campaign.service";
@@ -7,6 +8,7 @@ import type { Campaign, LeaderboardEntry } from "../../types";
 
 export function LeaderboardPage() {
   const { id } = useParams();
+  const { t } = useTranslation();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,10 +38,10 @@ export function LeaderboardPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          Campaign not found
+          {t("leaderboardPage.campaignNotFound")}
         </p>
         <Link to="/" className="mt-4 text-sm text-brand hover:underline">
-          ← Back to Home
+          ← {t("common.back")}
         </Link>
       </div>
     );
@@ -53,12 +55,12 @@ export function LeaderboardPage() {
         to={`/influencer/campaigns/${campaign.id}`}
         className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
       >
-        <ArrowLeft size={14} /> Back to Campaign
+        <ArrowLeft size={14} /> {t("leaderboardPage.backToCampaign")}
       </Link>
 
       <div className="mb-8">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Leaderboard
+          {t("leaderboardPage.liveLeaderboard")}
         </h1>
         <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
           {campaign.title}
@@ -143,7 +145,7 @@ export function LeaderboardPage() {
       {/* Full Rankings Table */}
       <div className="card rounded-xl p-6">
         <h2 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          Full Rankings
+          {t("leaderboardPage.fullRankings")}
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -203,7 +205,7 @@ export function LeaderboardPage() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-brand hover:underline"
                     >
-                      Watch <ExternalLink size={12} />
+                      {t("leaderboardPage.watch")} <ExternalLink size={12} />
                     </a>
                   </td>
                 </tr>

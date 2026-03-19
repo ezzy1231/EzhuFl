@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import {
   Trophy,
   DollarSign,
@@ -16,6 +17,7 @@ import type { Campaign } from "../../types";
 
 export function LandingPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     getAllCampaigns()
@@ -36,16 +38,16 @@ export function LandingPage() {
         <div className="relative mx-auto max-w-7xl px-6 pb-20 pt-24 text-center sm:pt-32">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-sm font-medium text-brand">
             <Trophy size={14} />
-            Performance-Based Creator Campaigns
+            {t("landing.badge")}
           </div>
 
           <h1
             className="mx-auto max-w-4xl text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl lg:text-7xl"
             style={{ color: "var(--text-primary)" }}
           >
-            Earn Money From{" "}
+            {t("landing.heroTitle1")}{" "}
             <span className="bg-gradient-to-r from-brand to-purple-400 bg-clip-text text-transparent">
-              Your Content
+              {t("landing.heroTitle2")}
             </span>
           </h1>
 
@@ -53,9 +55,7 @@ export function LandingPage() {
             className="mx-auto mt-6 max-w-2xl text-lg"
             style={{ color: "var(--text-secondary)" }}
           >
-            Businesses create campaigns with real prize pools. Creators compete
-            by posting content. Top performers climb the leaderboard and win
-            cash. Simple.
+            {t("landing.heroSubtitle")}
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -63,7 +63,7 @@ export function LandingPage() {
               to="/signup"
               className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-brand-hover hover:shadow-lg hover:shadow-brand/25"
             >
-              Start Earning
+              {t("landing.startEarning")}
               <ArrowRight size={18} />
             </Link>
             <Link
@@ -71,7 +71,7 @@ export function LandingPage() {
               className="card inline-flex items-center gap-2 rounded-xl px-8 py-3.5 text-base font-semibold transition-colors"
               style={{ color: "var(--text-primary)" }}
             >
-              I'm a Business
+              {t("landing.imBusiness")}
             </Link>
           </div>
 
@@ -93,9 +93,9 @@ export function LandingPage() {
             </div>
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
               <span className="font-semibold" style={{ color: "var(--text-primary)" }}>
-                500+
+                {t("landing.creatorsCount")}
               </span>{" "}
-              creators already earning
+              {t("landing.creatorsEarning")}
             </p>
           </div>
         </div>
@@ -112,10 +112,10 @@ export function LandingPage() {
               className="text-3xl font-bold sm:text-4xl"
               style={{ color: "var(--text-primary)" }}
             >
-              How It Works
+              {t("landing.howItWorks")}
             </h2>
             <p className="mt-4" style={{ color: "var(--text-secondary)" }}>
-              Three simple steps to start earning
+              {t("landing.howItWorksSubtitle")}
             </p>
           </div>
 
@@ -123,23 +123,20 @@ export function LandingPage() {
             {[
               {
                 step: "01",
-                title: "Join a Campaign",
-                description:
-                  "Browse active campaigns from top Ethiopian brands. Pick one that matches your style and audience.",
+                title: t("landing.step1Title"),
+                description: t("landing.step1Desc"),
                 icon: <Trophy size={24} />,
               },
               {
                 step: "02",
-                title: "Create & Submit",
-                description:
-                  "Post your best TikTok or Instagram content. Your performance is tracked automatically in real-time.",
+                title: t("landing.step2Title"),
+                description: t("landing.step2Desc"),
                 icon: <BarChart3 size={24} />,
               },
               {
                 step: "03",
-                title: "Win Cash Prizes",
-                description:
-                  "Top creators on the leaderboard split the prize pool. More engagement = bigger rewards.",
+                title: t("landing.step3Title"),
+                description: t("landing.step3Desc"),
                 icon: <DollarSign size={24} />,
               },
             ].map((item) => (
@@ -148,7 +145,7 @@ export function LandingPage() {
                   {item.icon}
                 </div>
                 <div className="mb-2 text-sm font-medium text-brand">
-                  Step {item.step}
+                  {t("landing.step")} {item.step}
                 </div>
                 <h3
                   className="mb-2 text-xl font-semibold"
@@ -183,10 +180,10 @@ export function LandingPage() {
                 className="text-3xl font-bold sm:text-4xl"
                 style={{ color: "var(--text-primary)" }}
               >
-                Active Campaigns
+                {t("landing.activeCampaigns")}
               </h2>
               <p className="mt-2" style={{ color: "var(--text-secondary)" }}>
-                Join now and start competing
+                {t("landing.joinAndCompete")}
               </p>
             </div>
             <Link
@@ -201,7 +198,7 @@ export function LandingPage() {
             {activeCampaigns.length === 0 ? (
               <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
                 <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                  No active campaigns right now — check back soon!
+                  {t("landing.noActiveCampaigns")}
                 </p>
               </div>
             ) : (
@@ -228,10 +225,10 @@ export function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
             {[
-              { label: "Campaigns Created", value: "500+", icon: <Trophy size={20} /> },
-              { label: "Active Creators", value: "10K+", icon: <Users size={20} /> },
-              { label: "Total Paid Out", value: "$250K+", icon: <DollarSign size={20} /> },
-              { label: "Avg. Engagement", value: "8.4%", icon: <TrendingUp size={20} /> },
+              { label: t("landing.campaignsCreated"), value: "500+", icon: <Trophy size={20} /> },
+              { label: t("landing.activeCreators"), value: "10K+", icon: <Users size={20} /> },
+              { label: t("landing.totalPaidOut"), value: "$250K+", icon: <DollarSign size={20} /> },
+              { label: t("landing.avgEngagement"), value: "8.4%", icon: <TrendingUp size={20} /> },
             ].map((stat) => (
               <div key={stat.label} className="card rounded-xl p-6 text-center">
                 <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 text-brand">
@@ -266,15 +263,15 @@ export function LandingPage() {
               className="text-3xl font-bold sm:text-4xl"
               style={{ color: "var(--text-primary)" }}
             >
-              What Creators Say
+              {t("landing.whatCreatorsSay")}
             </h2>
             <p className="mt-2" style={{ color: "var(--text-secondary)" }}>
-              Real results from real creators
+              {t("landing.realResults")}
             </p>
           </div>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {mockTestimonials.map((t, i) => (
+            {mockTestimonials.map((item, i) => (
               <div key={i} className="card rounded-xl p-6">
                 <div className="mb-4 flex gap-1">
                   {[...Array(5)].map((_, j) => (
@@ -285,21 +282,21 @@ export function LandingPage() {
                   className="mb-6 text-sm leading-relaxed"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  "{t.quote}"
+                  "{item.quote}"
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/15 text-sm font-bold text-brand">
-                    {t.avatar}
+                    {item.avatar}
                   </div>
                   <div>
                     <p
                       className="text-sm font-medium"
                       style={{ color: "var(--text-primary)" }}
                     >
-                      {t.name}
+                      {item.name}
                     </p>
                     <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                      {t.role}
+                      {item.role}
                     </p>
                   </div>
                 </div>
@@ -333,7 +330,7 @@ export function LandingPage() {
               to="/signup"
               className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-brand-hover hover:shadow-lg hover:shadow-brand/25"
             >
-              Create Your Account
+              {t("landing.createYourAccount")}
               <ArrowRight size={18} />
             </Link>
           </div>
@@ -349,7 +346,7 @@ export function LandingPage() {
           className="mx-auto max-w-7xl px-6 text-center text-sm"
           style={{ color: "var(--text-muted)" }}
         >
-          © 2026 CreatorPay. All rights reserved.
+          {t("landing.copyright")}
         </div>
       </footer>
     </div>

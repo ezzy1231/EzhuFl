@@ -1,5 +1,6 @@
 import { NavLink } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard,
   Trophy,
@@ -18,31 +19,32 @@ interface MobileLink {
   icon: React.ReactNode;
 }
 
-const influencerLinks: MobileLink[] = [
-  { to: "/influencer/dashboard", label: "Home", icon: <LayoutDashboard size={20} /> },
-  { to: "/influencer/campaigns", label: "Campaigns", icon: <Trophy size={20} /> },
-  { to: "/influencer/my-campaigns", label: "Active", icon: <FolderOpen size={20} /> },
-  { to: "/influencer/leaderboard", label: "Board", icon: <BarChart3 size={20} /> },
-  { to: "/influencer/earnings", label: "Earnings", icon: <DollarSign size={20} /> },
-  { to: "/influencer/profile", label: "Profile", icon: <UserCircle size={20} /> },
-];
-
-const businessLinks: MobileLink[] = [
-  { to: "/business/dashboard", label: "Home", icon: <LayoutDashboard size={20} /> },
-  { to: "/business/create", label: "Create", icon: <PlusCircle size={20} /> },
-  { to: "/business/campaigns", label: "Campaigns", icon: <FolderOpen size={20} /> },
-  { to: "/business/leaderboard", label: "Board", icon: <BarChart3 size={20} /> },
-  { to: "/business/profile", label: "Profile", icon: <UserCircle size={20} /> },
-];
-
-const adminLinks: MobileLink[] = [
-  { to: "/admin/dashboard", label: "Home", icon: <LayoutDashboard size={20} /> },
-  { to: "/admin/businesses", label: "Business", icon: <Building2 size={20} /> },
-  { to: "/admin/influencers", label: "Creators", icon: <Users size={20} /> },
-];
-
 export function MobileNav() {
   const { user } = useAuth();
+  const { t } = useTranslation();
+
+  const influencerLinks: MobileLink[] = [
+    { to: "/influencer/dashboard", label: t("nav.home"), icon: <LayoutDashboard size={20} /> },
+    { to: "/influencer/campaigns", label: t("nav.campaigns"), icon: <Trophy size={20} /> },
+    { to: "/influencer/my-campaigns", label: t("nav.active"), icon: <FolderOpen size={20} /> },
+    { to: "/influencer/leaderboard", label: t("nav.board"), icon: <BarChart3 size={20} /> },
+    { to: "/influencer/earnings", label: t("nav.earnings"), icon: <DollarSign size={20} /> },
+    { to: "/influencer/profile", label: t("nav.profile"), icon: <UserCircle size={20} /> },
+  ];
+
+  const businessLinks: MobileLink[] = [
+    { to: "/business/dashboard", label: t("nav.home"), icon: <LayoutDashboard size={20} /> },
+    { to: "/business/create", label: t("nav.create"), icon: <PlusCircle size={20} /> },
+    { to: "/business/campaigns", label: t("nav.campaigns"), icon: <FolderOpen size={20} /> },
+    { to: "/business/leaderboard", label: t("nav.board"), icon: <BarChart3 size={20} /> },
+    { to: "/business/profile", label: t("nav.profile"), icon: <UserCircle size={20} /> },
+  ];
+
+  const adminLinks: MobileLink[] = [
+    { to: "/admin/dashboard", label: t("nav.home"), icon: <LayoutDashboard size={20} /> },
+    { to: "/admin/businesses", label: t("common.business"), icon: <Building2 size={20} /> },
+    { to: "/admin/influencers", label: t("nav.creators"), icon: <Users size={20} /> },
+  ];
 
   let links: MobileLink[];
   if (user?.role === "ADMIN") {

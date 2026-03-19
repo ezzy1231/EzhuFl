@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import {
   Trophy,
   Clock,
@@ -17,6 +18,7 @@ import type { Campaign, LeaderboardEntry } from "../../types";
 
 export function CampaignDetailsPage() {
   const { id } = useParams();
+  const { t } = useTranslation();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,10 +59,10 @@ export function CampaignDetailsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          Campaign not found
+          {t("campaignDetails.campaignNotFound")}
         </p>
         <Link to="/influencer/campaigns" className="mt-4 text-sm text-brand hover:underline">
-          ← Back to Campaigns
+          ← {t("campaignDetails.backToCampaigns")}
         </Link>
       </div>
     );
@@ -124,7 +126,7 @@ export function CampaignDetailsPage() {
         to="/influencer/campaigns"
         className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
       >
-        <ArrowLeft size={14} /> Back to Campaigns
+        <ArrowLeft size={14} /> {t("campaignDetails.backToCampaigns")}
       </Link>
 
       {/* Campaign Header */}
@@ -187,7 +189,7 @@ export function CampaignDetailsPage() {
               <p className="text-3xl font-bold text-brand">
                 ${campaign.budget.toLocaleString()}
               </p>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Prize Pool</p>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignDetails.prizePool")}</p>
             </div>
           </div>
 
@@ -197,28 +199,28 @@ export function CampaignDetailsPage() {
             <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
               ${campaign.budget.toLocaleString()}
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Budget</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignDetails.budget")}</p>
           </div>
           <div className="rounded-lg p-3" style={{ backgroundColor: "var(--bg-secondary)" }}>
             <Trophy size={16} className="mb-1 text-amber-500" />
             <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
               {campaign.winners_count}
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Winners</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignDetails.winners")}</p>
           </div>
           <div className="rounded-lg p-3" style={{ backgroundColor: "var(--bg-secondary)" }}>
             <Clock size={16} className="mb-1 text-blue-400" />
             <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
               {campaign.duration_days}d
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Duration</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignDetails.duration")}</p>
           </div>
           <div className="rounded-lg p-3" style={{ backgroundColor: "var(--bg-secondary)" }}>
             <Users size={16} className="mb-1 text-emerald-500" />
             <p className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
               {leaderboard.length}
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Participants</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t("campaignDetails.participants")}</p>
           </div>
         </div>
         </div>
@@ -230,14 +232,14 @@ export function CampaignDetailsPage() {
           {/* Submit Video */}
           <div className="card rounded-xl p-6">
             <h2 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-              {hasJoined ? "Submit Your Video" : "Join this Campaign"}
+              {hasJoined ? t("campaignDetails.submitYourVideo") : t("campaignDetails.joinThisCampaign")}
             </h2>
 
             {!hasJoined ? (
               /* ── Not joined yet ── */
               <div className="space-y-3">
                 <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                  Join this campaign to start submitting your content and compete for the prize pool.
+                  {t("campaignDetails.joinText")}
                 </p>
                 <button
                   onClick={handleJoin}
@@ -245,7 +247,7 @@ export function CampaignDetailsPage() {
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
                 >
                   <Send size={14} />
-                  {joining ? "Joining..." : campaign.status !== "ACTIVE" ? "Campaign Not Active" : "Join Campaign"}
+                  {joining ? t("common.joining") : campaign.status !== "ACTIVE" ? t("campaignDetails.campaignNotActive") : t("campaignDetails.joinCampaign")}
                 </button>
               </div>
             ) : submitted ? (
@@ -253,10 +255,10 @@ export function CampaignDetailsPage() {
               <div className="space-y-3">
                 <div className="rounded-lg bg-emerald-500/10 p-4 text-center">
                   <p className="text-sm font-medium text-emerald-500">
-                    Video submitted successfully!
+                    {t("campaignDetails.videoSubmitted")}
                   </p>
                   <p className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
-                    Your performance will be tracked automatically.
+                    {t("campaignDetails.performanceTracked")}
                   </p>
                 </div>
                 <button
@@ -264,14 +266,14 @@ export function CampaignDetailsPage() {
                   className="w-full rounded-lg border py-2 text-sm font-medium transition-colors hover:bg-brand/10"
                   style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
                 >
-                  Submit Another Video
+                  {t("campaignDetails.submitAnother")}
                 </button>
               </div>
             ) : (
               /* ── Joined — show submit form ── */
               <div className="space-y-3">
                 <div className="rounded-lg bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-500">
-                  ✓ Already joined
+                  {t("campaignDetails.alreadyJoined")}
                 </div>
                 {submitError && (
                   <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-500">
@@ -282,11 +284,11 @@ export function CampaignDetailsPage() {
                   type="url"
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="Paste your TikTok/Instagram/YouTube URL"
+                  placeholder={t("campaignDetails.pasteUrl")}
                   className="input-field w-full"
                 />
                 <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  Stats (views, likes, comments) will be fetched automatically from the platform.
+                  {t("campaignDetails.statsHint")}
                 </p>
                 <button
                   onClick={handleSubmit}
@@ -294,7 +296,7 @@ export function CampaignDetailsPage() {
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
                 >
                   <Send size={14} />
-                  {submitting ? "Submitting..." : "Submit Video"}
+                  {submitting ? t("campaignDetails.submitting") : t("campaignDetails.submitVideo")}
                 </button>
               </div>
             )}
@@ -303,7 +305,7 @@ export function CampaignDetailsPage() {
           {/* Prize Distribution */}
           <div className="card rounded-xl p-6">
             <h2 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-              Prize Distribution
+              {t("campaignDetails.prizeDistribution")}
             </h2>
             <div className="space-y-2">
               {prizeDistribution.map((pct, i) => (
@@ -328,7 +330,7 @@ export function CampaignDetailsPage() {
                       {i + 1}
                     </span>
                     <span style={{ color: "var(--text-secondary)" }}>
-                      {i === 0 ? "1st" : i === 1 ? "2nd" : i === 2 ? "3rd" : `${i + 1}th`} Place
+                      {i === 0 ? t("campaignDetails.1stPlace") : i === 1 ? t("campaignDetails.2ndPlace") : i === 2 ? t("campaignDetails.3rdPlace") : t("campaignDetails.nthPlace", { n: i + 1 })}
                     </span>
                   </span>
                   <span className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
@@ -345,7 +347,7 @@ export function CampaignDetailsPage() {
           <div className="card rounded-xl p-6">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-                Live Leaderboard
+                {t("campaignDetails.liveLeaderboard")}
               </h2>
               {leaderboard.length > 0 && (
                 <button
@@ -363,13 +365,13 @@ export function CampaignDetailsPage() {
                   className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-brand/10 disabled:opacity-50"
                   style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
                 >
-                  {refreshing ? "Refreshing..." : "↻ Refresh Stats"}
+                  {refreshing ? t("campaignDetails.refreshing") : t("campaignDetails.refreshStats")}
                 </button>
               )}
             </div>
             {leaderboard.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="text-sm" style={{ color: "var(--text-muted)" }}>No submissions yet. Be the first to join!</p>
+                <p className="text-sm" style={{ color: "var(--text-muted)" }}>{t("campaignDetails.noSubmissions")}</p>
               </div>
             ) : (
             <div className="overflow-x-auto">

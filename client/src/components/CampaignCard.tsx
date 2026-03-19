@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Campaign, CampaignStatus } from "../types";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Users, CheckCircle, UserPlus } from "lucide-react";
 import { joinCampaign } from "../services/campaign.service";
 
@@ -66,6 +67,7 @@ function timeAgo(dateStr: string): string {
 export function CampaignCard({ campaign, linkPrefix, showJoin }: CampaignCardProps) {
   const [joining, setJoining] = useState(false);
   const [joined, setJoined] = useState(false);
+  const { t } = useTranslation();
 
   const handleJoin = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -192,7 +194,7 @@ export function CampaignCard({ campaign, linkPrefix, showJoin }: CampaignCardPro
               }`}
             >
               <UserPlus size={12} />
-              {joined ? "Joined" : joining ? "Joining..." : "Join"}
+              {joined ? t("common.joined") : joining ? t("common.joining") : t("common.join")}
             </button>
           )}
         </div>
