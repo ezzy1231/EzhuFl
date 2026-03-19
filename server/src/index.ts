@@ -26,6 +26,11 @@ app.use(
         callback(null, true);
         return;
       }
+      // Allow Vercel preview deployments (e.g. ezhu-*-ezzy1231s-projects.vercel.app)
+      if (origin.endsWith(".vercel.app") && origin.includes("ezhu")) {
+        callback(null, true);
+        return;
+      }
       callback(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,

@@ -165,89 +165,78 @@ export async function tiktokCallback(
     const syntheticEmail = `tiktok.${tiktokOpenId}@tiktok.users.noreply`;
 
     // ── Find or create Supabase user ──
-    // Look up by synthetic email directly (avoids pagination issues with listUsers)
-    const { data: userByEmail } = await supabase
-      .from("users")
-      .select("id")
-      .eq("email", syntheticEmail)
-      .single();
-
-    // Also try admin getUserById list with filter as fallback
-    let existingUser: any = null;
-    if (userByEmail) {
-      const { data: adminUser } = await supabase.auth.admin.getUserById(userByEmail.id);
-      existingUser = adminUser?.user || null;
-    }
-
-    // If not found via users table, try listUsers with a targeted approach
-    if (!existingUser) {
-      const { data: listedUsers } = await supabase.auth.admin.listUsers({ perPage: 1000 });
-      existingUser = listedUsers?.users?.find(
-        (u) => u.email === syntheticEmail
-      ) || null;
-    }
-
+    // Strategy: try to create first. If email_exists, update instead.
     let userId: string;
 
-    if (existingUser) {
-      userId = existingUser.id;
-      // Update metadata with latest TikTok info
-      await supabase.auth.admin.updateUserById(userId, {
+    const { data: newUser, error: createErr } =
+      await supabase.auth.admin.createUser({
+        email: syntheticEmail,
+        email_confirm: true,
         user_metadata: {
-          ...existingUser.user_metadata,
           tiktok_open_id: tiktokOpenId,
           tiktok_username: username,
           tiktok_display_name: displayName,
           tiktok_avatar_url: avatarUrl,
           tiktok_bio: bio,
-          name: existingUser.user_metadata?.name || displayName,
-          full_name: existingUser.user_metadata?.full_name || displayName,
-          avatar_url: existingUser.user_metadata?.avatar_url || avatarUrl,
+          name: displayName,
+          full_name: displayName,
+          avatar_url: avatarUrl,
+          provider: "tiktok",
+        },
+      });
+
+    if (newUser?.user) {
+      // New user created successfully
+      userId = newUser.user.id;
+    } else if (createErr && (createErr as any).code === "email_exists") {
+      // User already exists — find them by paginating through all auth users
+      let foundUser: any = null;
+      let page = 1;
+      const perPage = 100;
+
+      while (!foundUser) {
+        const { data: batch } = await supabase.auth.admin.listUsers({
+          page,
+          perPage,
+        });
+
+        if (!batch?.users || batch.users.length === 0) break;
+
+        foundUser = batch.users.find((u) => u.email === syntheticEmail);
+        if (batch.users.length < perPage) break; // last page
+        page++;
+      }
+
+      if (!foundUser) {
+        console.error("User exists in auth but could not be found via listUsers");
+        res.redirect(
+          `${clientUrl}/login?error=${encodeURIComponent("Account lookup failed — please try again")}`
+        );
+        return;
+      }
+
+      userId = foundUser.id;
+
+      // Update metadata with latest TikTok info
+      await supabase.auth.admin.updateUserById(userId, {
+        user_metadata: {
+          ...foundUser.user_metadata,
+          tiktok_open_id: tiktokOpenId,
+          tiktok_username: username,
+          tiktok_display_name: displayName,
+          tiktok_avatar_url: avatarUrl,
+          tiktok_bio: bio,
+          name: foundUser.user_metadata?.name || displayName,
+          full_name: foundUser.user_metadata?.full_name || displayName,
+          avatar_url: foundUser.user_metadata?.avatar_url || avatarUrl,
         },
       });
     } else {
-      // Create new user
-      const { data: newUser, error: createErr } =
-        await supabase.auth.admin.createUser({
-          email: syntheticEmail,
-          email_confirm: true,
-          user_metadata: {
-            tiktok_open_id: tiktokOpenId,
-            tiktok_username: username,
-            tiktok_display_name: displayName,
-            tiktok_avatar_url: avatarUrl,
-            tiktok_bio: bio,
-            name: displayName,
-            full_name: displayName,
-            avatar_url: avatarUrl,
-            provider: "tiktok",
-          },
-        });
-
-      if (createErr || !newUser.user) {
-        // If user already exists (race condition or lookup miss), find and use them
-        if (createErr && (createErr as any).code === "email_exists") {
-          const { data: retryList } = await supabase.auth.admin.listUsers({ perPage: 1000 });
-          const found = retryList?.users?.find((u) => u.email === syntheticEmail);
-          if (found) {
-            userId = found.id;
-          } else {
-            console.error("User exists but cannot be found:", createErr);
-            res.redirect(
-              `${clientUrl}/login?error=${encodeURIComponent("Failed to create account")}`
-            );
-            return;
-          }
-        } else {
-          console.error("Failed to create Supabase user for TikTok:", createErr);
-          res.redirect(
-            `${clientUrl}/login?error=${encodeURIComponent("Failed to create account")}`
-          );
-          return;
-        }
-      } else {
-        userId = newUser.user.id;
-      }
+      console.error("Failed to create Supabase user for TikTok:", createErr);
+      res.redirect(
+        `${clientUrl}/login?error=${encodeURIComponent("Failed to create account")}`
+      );
+      return;
     }
 
     // ── Generate a magic link so the client gets a real Supabase session ──
