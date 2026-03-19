@@ -19,6 +19,9 @@ import { TermsPage } from "./pages/public/TermsPage";
 import { PrivacyPage } from "./pages/public/PrivacyPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
+// Shared pages
+import { SharedLeaderboardPage } from "./pages/shared/LeaderboardPage";
+
 // Influencer pages
 import { InfluencerDashboard } from "./pages/influencer/Dashboard";
 import { CampaignsPage } from "./pages/influencer/CampaignsPage";
@@ -115,6 +118,14 @@ export default function App() {
               element={<EarningsPage />}
             />
             <Route
+              path="/influencer/leaderboard"
+              element={<SharedLeaderboardPage />}
+            />
+            <Route
+              path="/influencer/leaderboard/:id"
+              element={<SharedLeaderboardPage />}
+            />
+            <Route
               path="/influencer/profile"
               element={<InfluencerProfilePage />}
             />
@@ -162,6 +173,14 @@ export default function App() {
             <Route
               path="/business/profile"
               element={<BusinessProfilePage />}
+            />
+            <Route
+              path="/business/leaderboard"
+              element={<SharedLeaderboardPage />}
+            />
+            <Route
+              path="/business/leaderboard/:id"
+              element={<SharedLeaderboardPage />}
             />
           </Route>
         </Route>

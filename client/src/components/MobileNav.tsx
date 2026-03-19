@@ -9,6 +9,7 @@ import {
   UserCircle,
   Building2,
   Users,
+  BarChart3,
 } from "lucide-react";
 
 interface MobileLink {
@@ -21,6 +22,7 @@ const influencerLinks: MobileLink[] = [
   { to: "/influencer/dashboard", label: "Home", icon: <LayoutDashboard size={20} /> },
   { to: "/influencer/campaigns", label: "Campaigns", icon: <Trophy size={20} /> },
   { to: "/influencer/my-campaigns", label: "Active", icon: <FolderOpen size={20} /> },
+  { to: "/influencer/leaderboard", label: "Board", icon: <BarChart3 size={20} /> },
   { to: "/influencer/earnings", label: "Earnings", icon: <DollarSign size={20} /> },
   { to: "/influencer/profile", label: "Profile", icon: <UserCircle size={20} /> },
 ];
@@ -29,6 +31,7 @@ const businessLinks: MobileLink[] = [
   { to: "/business/dashboard", label: "Home", icon: <LayoutDashboard size={20} /> },
   { to: "/business/create", label: "Create", icon: <PlusCircle size={20} /> },
   { to: "/business/campaigns", label: "Campaigns", icon: <FolderOpen size={20} /> },
+  { to: "/business/leaderboard", label: "Board", icon: <BarChart3 size={20} /> },
   { to: "/business/profile", label: "Profile", icon: <UserCircle size={20} /> },
 ];
 
