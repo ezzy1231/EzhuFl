@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "../../components/Spinner";
+import { Button } from "../../components/ui/Button";
 import { Trophy } from "lucide-react";
 import { getApiErrorMessage } from "../../services/api";
 
@@ -141,13 +142,9 @@ export function LoginPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary w-full"
-            >
+            <Button type="submit" disabled={loading} className="w-full">
               {loading ? <Spinner size="sm" /> : t("login.signIn")}
-            </button>
+            </Button>
           </form>
 
           {/* Divider */}
@@ -158,26 +155,40 @@ export function LoginPage() {
           </div>
 
           {/* Google Sign In */}
-          <button
+          <Button
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
-            className="btn btn-social"
+            variant="secondary"
+            className="w-full justify-center"
           >
-            {googleLoading ? <Spinner size="sm" /> : <><GoogleIcon className="h-5 w-5" /> {t("login.continueWithGoogle")}</>}
-          </button>
+            {googleLoading ? (
+              <Spinner size="sm" />
+            ) : (
+              <>
+                <GoogleIcon className="h-5 w-5" /> {t("login.continueWithGoogle")}
+              </>
+            )}
+          </Button>
 
           {/* TikTok Sign In */}
-          <button
+          <Button
             onClick={() => {
               setError("");
               setTiktokLoading(true);
               signInWithTikTok();
             }}
             disabled={tiktokLoading}
-            className="btn btn-social mt-3"
+            variant="secondary"
+            className="mt-3 w-full justify-center"
           >
-            {tiktokLoading ? <Spinner size="sm" /> : <><TikTokIcon className="h-5 w-5" /> {t("login.continueWithTiktok")}</>}
-          </button>
+            {tiktokLoading ? (
+              <Spinner size="sm" />
+            ) : (
+              <>
+                <TikTokIcon className="h-5 w-5" /> {t("login.continueWithTiktok")}
+              </>
+            )}
+          </Button>
 
           <p className="mt-6 text-center text-sm" style={{ color: "var(--text-secondary)" }}>
             {t("login.noAccount")}{" "}

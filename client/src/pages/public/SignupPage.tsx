@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "../../components/Spinner";
+import { Button } from "../../components/ui/Button";
+import { Card, CardContent } from "../../components/ui/Card";
 import { Trophy } from "lucide-react";
 import type { UserRole } from "../../types";
 import { getApiErrorMessage } from "../../services/api";
@@ -67,23 +69,22 @@ export function SignupPage() {
   if (needsConfirmation) {
     return (
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
-        <div className="card w-full max-w-md rounded-2xl p-8 text-center shadow-xl">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20">
-            <span className="text-2xl">✉️</span>
-          </div>
-          <h2 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
-            {t("signup.checkEmail")}
-          </h2>
-          <p className="mt-3 text-sm" style={{ color: "var(--text-secondary)" }}>
-            {t("signup.confirmationSent")} <strong>{email}</strong>. {t("signup.confirmText")}
-          </p>
-          <Link
-            to="/login"
-            className="mt-6 inline-block text-sm font-medium text-brand hover:underline"
-          >
-            {t("signup.backToLogin")}
-          </Link>
-        </div>
+        <Card className="w-full max-w-md rounded-2xl">
+          <CardContent className="p-8 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20">
+              <span className="text-2xl">✉️</span>
+            </div>
+            <h2 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+              {t("signup.checkEmail")}
+            </h2>
+            <p className="mt-3 text-sm" style={{ color: "var(--text-secondary)" }}>
+              {t("signup.confirmationSent")} <strong>{email}</strong>. {t("signup.confirmText")}
+            </p>
+            <Link to="/login" className="mt-6 inline-block">
+              <Button variant="secondary">{t("signup.backToLogin")}</Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -202,13 +203,9 @@ export function SignupPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary w-full"
-            >
+            <Button type="submit" disabled={loading} className="w-full">
               {loading ? <Spinner size="sm" /> : t("signup.createAccountBtn")}
-            </button>
+            </Button>
           </form>
 
           {/* Divider */}
@@ -219,7 +216,7 @@ export function SignupPage() {
           </div>
 
           {/* Google Sign Up */}
-          <button
+          <Button
             onClick={async () => {
               setError("");
               setGoogleLoading(true);
@@ -231,23 +228,37 @@ export function SignupPage() {
               }
             }}
             disabled={googleLoading}
-            className="btn btn-social"
+            variant="secondary"
+            className="w-full justify-center"
           >
-            {googleLoading ? <Spinner size="sm" /> : <><GoogleIcon className="h-5 w-5" /> {t("signup.continueWithGoogle")}</>}
-          </button>
+            {googleLoading ? (
+              <Spinner size="sm" />
+            ) : (
+              <>
+                <GoogleIcon className="h-5 w-5" /> {t("signup.continueWithGoogle")}
+              </>
+            )}
+          </Button>
 
           {/* TikTok Sign Up */}
-          <button
+          <Button
             onClick={() => {
               setError("");
               setTiktokLoading(true);
               signInWithTikTok();
             }}
             disabled={tiktokLoading}
-            className="btn btn-social mt-3"
+            variant="secondary"
+            className="mt-3 w-full justify-center"
           >
-            {tiktokLoading ? <Spinner size="sm" /> : <><TikTokIcon className="h-5 w-5" /> {t("signup.continueWithTiktok")}</>}
-          </button>
+            {tiktokLoading ? (
+              <Spinner size="sm" />
+            ) : (
+              <>
+                <TikTokIcon className="h-5 w-5" /> {t("signup.continueWithTiktok")}
+              </>
+            )}
+          </Button>
 
           <p className="mt-6 text-center text-sm" style={{ color: "var(--text-secondary)" }}>
             {t("signup.haveAccount")}{" "}

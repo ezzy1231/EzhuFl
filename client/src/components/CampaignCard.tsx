@@ -1,10 +1,13 @@
 import { useState } from "react";
-import type { Campaign, CampaignStatus } from "../types";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Users, CheckCircle, UserPlus } from "lucide-react";
+
+import type { Campaign, CampaignStatus } from "../types";
 import { joinCampaign } from "../services/campaign.service";
 import { isApiError } from "../services/api";
+import { Button } from "./ui/Button";
+import { Card, CardContent } from "./ui/Card";
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -65,6 +68,15 @@ function timeAgo(dateStr: string): string {
   return `${weeks}w`;
 }
 
+function formatMoney(amount: number) {
+  if (Number.isNaN(amount)) return "$0";
+  if (amount >= 1000) {
+    const k = amount / 1000;
+    return `$${k.toFixed(amount % 1000 === 0 ? 0 : 1)}K`;
+  }
+  return `$${amount.toLocaleString()}`;
+}
+
 export function CampaignCard({ campaign, linkPrefix, showJoin }: CampaignCardProps) {
   const [joining, setJoining] = useState(false);
   const [joined, setJoined] = useState(false);
@@ -87,119 +99,128 @@ export function CampaignCard({ campaign, linkPrefix, showJoin }: CampaignCardPro
     }
   };
 
+  const platforms = campaign.platforms?.length ? campaign.platforms : ["TIKTOK"];
+
   return (
-    <Link
-      to={`${linkPrefix}/${campaign.id}`}
-      className="card group block overflow-hidden"
-    >
-      {/* Cover Image */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-brand/20 to-purple-500/20">
-        {campaign.cover_image_url ? (
-          <img
-            src={campaign.cover_image_url}
-            alt={campaign.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <span className="text-4xl font-black text-brand/30">
-              {campaign.title.charAt(0).toUpperCase()}
-            </span>
-          </div>
-        )}
+    <Link to={`${linkPrefix}/${campaign.id}`} className="block">
+      <Card className="group overflow-hidden rounded-2xl">
+        {/* Cover */}
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-brand/20 to-purple-500/20">
+          {campaign.cover_image_url ? (
+            <img
+              src={campaign.cover_image_url}
+              alt={campaign.title}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <span className="text-4xl font-black text-brand/30">
+                {campaign.title.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
 
-        {/* Status badge (top-right) */}
-        <span
-          className={`absolute right-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold backdrop-blur-sm ${statusStyles[campaign.status]}`}
-        >
-          {campaign.status}
-        </span>
-      </div>
+          {/* Status */}
+          <span
+            className={`absolute right-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold backdrop-blur-sm ${statusStyles[campaign.status]}`}
+          >
+            {campaign.status}
+          </span>
+        </div>
 
-      {/* Content */}
-      <div className="p-4">
-        {/* Business info row */}
-        <div className="mb-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Business avatar */}
-            <div className="h-7 w-7 flex-shrink-0 overflow-hidden rounded-full bg-brand/15">
-              {campaign.business_profile_photo_url ? (
-                <img
-                  src={campaign.business_profile_photo_url}
-                  alt={campaign.business_name}
-                  className="h-full w-full object-cover"
+        <CardContent className="p-4">
+          {/* Business row */}
+          <div className="mb-2.5 flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="h-7 w-7 flex-shrink-0 overflow-hidden rounded-full bg-brand/15">
+                {campaign.business_profile_photo_url ? (
+                  <img
+                    src={campaign.business_profile_photo_url}
+                    alt={campaign.business_name}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-[10px] font-bold text-brand">
+                    {campaign.business_name?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
+                )}
+              </div>
+
+              <span
+                className="truncate text-sm font-medium"
+                style={{ color: "var(--text-primary)" }}
+              >
+                {campaign.business_name || "Business"}
+              </span>
+              {campaign.business_verified ? (
+                <CheckCircle
+                  size={14}
+                  className="flex-shrink-0 text-blue-500"
                 />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-[10px] font-bold text-brand">
-                  {campaign.business_name?.charAt(0)?.toUpperCase() || "?"}
-                </div>
-              )}
+              ) : null}
+              <span
+                className="flex-shrink-0 text-xs"
+                style={{ color: "var(--text-muted)" }}
+              >
+                · {timeAgo(campaign.created_at)}
+              </span>
             </div>
 
-            {/* Name + verified + time */}
+            <div
+              className="flex items-center gap-1.5"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {platforms.map((p) => (
+                <PlatformIcon key={p} platform={p} />
+              ))}
+            </div>
+          </div>
+
+          {/* Title */}
+          <h3
+            className="mb-3 text-sm font-semibold leading-snug transition-colors group-hover:text-brand"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {campaign.title}
+          </h3>
+
+          {/* Bottom */}
+          <div className="flex items-center gap-3 text-xs">
+            <span className="font-semibold text-brand">
+              {formatMoney(campaign.budget)}
+            </span>
+
             <span
-              className="truncate text-sm font-medium"
-              style={{ color: "var(--text-primary)" }}
+              className="flex items-center gap-1"
+              style={{ color: "var(--text-muted)" }}
             >
-              {campaign.business_name || "Business"}
+              <Users size={12} />
+              {campaign.participants_count ?? 0}
             </span>
-            {campaign.business_verified && <CheckCircle size={14} className="flex-shrink-0 text-blue-500" />}
-            <span className="flex-shrink-0 text-xs" style={{ color: "var(--text-muted)" }}>
-              · {timeAgo(campaign.created_at)}
-            </span>
+
+            {showJoin && campaign.status === "ACTIVE" ? (
+              <div className="ml-auto">
+                <Button
+                  size="sm"
+                  variant={joined ? "secondary" : "primary"}
+                  onClick={handleJoin}
+                  disabled={joining || joined}
+                  className={joined ? "text-emerald-600" : undefined}
+                >
+                  <UserPlus size={14} />
+                  {joined
+                    ? t("common.joined")
+                    : joining
+                      ? t("common.joining")
+                      : t("common.join")}
+                </Button>
+              </div>
+            ) : null}
           </div>
-
-          {/* Platform icons */}
-          <div className="flex items-center gap-1.5" style={{ color: "var(--text-muted)" }}>
-            {(campaign.platforms?.length > 0
-              ? campaign.platforms
-              : ["TIKTOK"]
-            ).map((p) => (
-              <PlatformIcon key={p} platform={p} />
-            ))}
-          </div>
-        </div>
-
-        {/* Campaign title */}
-        <h3
-          className="mb-3 text-sm font-semibold leading-snug transition-colors group-hover:text-brand"
-          style={{ color: "var(--text-primary)" }}
-        >
-          {campaign.title}
-        </h3>
-
-        {/* Bottom row: budget · participants · rate */}
-        <div className="flex items-center gap-3 text-xs">
-          <span className="font-semibold text-brand">
-            $0
-            <span style={{ color: "var(--text-muted)" }}>
-              /${campaign.budget >= 1000
-                ? `${(campaign.budget / 1000).toFixed(campaign.budget % 1000 === 0 ? 0 : 1)}K`
-                : campaign.budget.toLocaleString()}
-            </span>
-          </span>
-
-          <span className="flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
-            <Users size={12} />
-            {campaign.participants_count ?? 0}
-          </span>
-
-          {showJoin && campaign.status === "ACTIVE" && (
-            <button
-              onClick={handleJoin}
-              disabled={joining || joined}
-              className={`ml-auto flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors ${
-                joined
-                  ? "bg-emerald-500/15 text-emerald-500"
-                  : "bg-brand text-white hover:bg-brand-hover"
-              }`}
-            >
-              <UserPlus size={12} />
-              {joined ? t("common.joined") : joining ? t("common.joining") : t("common.join")}
-            </button>
-          )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </Link>
   );
 }

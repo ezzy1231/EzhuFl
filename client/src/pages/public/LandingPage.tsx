@@ -15,6 +15,9 @@ import { getApiErrorMessage } from "../../services/api";
 import { getAllCampaigns } from "../../services/campaign.service";
 import { getPublicStats, type PublicStats } from "../../services/stats.service";
 import { CampaignCard } from "../../components/CampaignCard";
+import { Button } from "../../components/ui/Button";
+import { Card, CardContent } from "../../components/ui/Card";
+import { EmptyState } from "../../components/ui/EmptyState";
 import type { Campaign } from "../../types";
 
 export function LandingPage() {
@@ -78,19 +81,19 @@ export function LandingPage() {
             {t("landing.heroSubtitle")}
           </p>
 
-          <div className="mt-10 flex animate-slide-up flex-col items-center justify-center gap-4 sm:flex-row" style={{ animationDelay: "300ms", animationFillMode: "both" }}>
-            <Link
-              to="/signup"
-              className="btn btn-primary px-8 py-4 text-base"
-            >
-              {t("landing.startEarning")}
-              <ArrowRight size={18} />
+          <div
+            className="mt-10 flex animate-slide-up flex-col items-center justify-center gap-4 sm:flex-row"
+            style={{ animationDelay: "300ms", animationFillMode: "both" }}
+          >
+            <Link to="/signup">
+              <Button className="h-12 px-8 text-base">
+                {t("landing.startEarning")} <ArrowRight size={18} />
+              </Button>
             </Link>
-            <Link
-              to="/signup"
-              className="btn btn-secondary px-8 py-4 text-base"
-            >
-              {t("landing.imBusiness")}
+            <Link to="/signup">
+              <Button variant="secondary" className="h-12 px-8 text-base">
+                {t("landing.imBusiness")}
+              </Button>
             </Link>
           </div>
 
@@ -98,17 +101,17 @@ export function LandingPage() {
           <div className="mt-12 flex animate-slide-up items-center justify-center gap-6" style={{ animationDelay: "400ms", animationFillMode: "both" }}>
             <div className="flex -space-x-2">
               {["AT", "SK", "DH", "HG", "YT"].map((initials, i) => (
-                <div
-                  key={i}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border-2 text-[10px] font-bold text-brand"
-                  style={{
-                    borderColor: "var(--bg-primary)",
-                    backgroundColor: "var(--bg-card)",
-                  }}
-                >
-                  {initials}
-                </div>
-              ))}
+              <div
+                key={i}
+                className="flex h-8 w-8 items-center justify-center rounded-full border-2 text-[10px] font-bold text-brand"
+                style={{
+                  borderColor: "var(--bg-primary)",
+                  backgroundColor: "var(--bg-card)",
+                }}
+              >
+                {initials}
+              </div>
+            ))}
             </div>
             <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
               <span className="font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -159,26 +162,28 @@ export function LandingPage() {
                 icon: <DollarSign size={24} />,
               },
             ].map((item) => (
-              <div key={item.step} className="card group p-8">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
-                  {item.icon}
-                </div>
-                <div className="mb-2 text-sm font-medium text-brand">
-                  {t("landing.step")} {item.step}
-                </div>
-                <h3
-                  className="mb-2 text-xl font-semibold"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {item.title}
-                </h3>
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {item.description}
-                </p>
-              </div>
+              <Card key={item.step} className="group rounded-2xl">
+                <CardContent className="p-8">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+                    {item.icon}
+                  </div>
+                  <div className="mb-2 text-sm font-medium text-brand">
+                    {t("landing.step")} {item.step}
+                  </div>
+                  <h3
+                    className="mb-2 text-xl font-semibold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {item.description}
+                  </p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -215,10 +220,8 @@ export function LandingPage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {activeCampaigns.length === 0 ? (
-              <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                  {t("landing.noActiveCampaigns")}
-                </p>
+              <div className="col-span-full">
+                <EmptyState description={t("landing.noActiveCampaigns")} />
               </div>
             ) : (
               activeCampaigns.slice(0, 6).map((campaign) => (
@@ -249,23 +252,25 @@ export function LandingPage() {
               { label: t("landing.totalPaidOut"), value: stats ? `$${stats.totalPaidOut.toLocaleString()}` : "—", icon: <DollarSign size={20} /> },
               { label: t("landing.avgEngagement"), value: stats ? `${stats.avgEngagementRate}%` : "—", icon: <TrendingUp size={20} /> },
             ].map((stat) => (
-              <div key={stat.label} className="card rounded-xl p-6 text-center">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 text-brand">
-                  {stat.icon}
-                </div>
-                <div
-                  className="text-3xl font-bold"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {stat.value}
-                </div>
-                <div
-                  className="mt-1 text-sm"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {stat.label}
-                </div>
-              </div>
+              <Card key={stat.label} className="rounded-2xl">
+                <CardContent className="p-6 text-center">
+                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                    {stat.icon}
+                  </div>
+                  <div
+                    className="text-3xl font-bold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div
+                    className="mt-1 text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {stat.label}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -291,35 +296,41 @@ export function LandingPage() {
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {mockTestimonials.map((item, i) => (
-              <div key={i} className="card rounded-xl p-6">
-                <div className="mb-4 flex gap-1">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} size={14} className="fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p
-                  className="mb-6 text-sm leading-relaxed"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  "{item.quote}"
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/15 text-sm font-bold text-brand">
-                    {item.avatar}
+              <Card key={i} className="rounded-2xl">
+                <CardContent className="p-6">
+                  <div className="mb-4 flex gap-1">
+                    {[...Array(5)].map((_, j) => (
+                      <Star
+                        key={j}
+                        size={14}
+                        className="fill-amber-400 text-amber-400"
+                      />
+                    ))}
                   </div>
-                  <div>
-                    <p
-                      className="text-sm font-medium"
-                      style={{ color: "var(--text-primary)" }}
-                    >
-                      {item.name}
-                    </p>
-                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                      {item.role}
-                    </p>
+                  <p
+                    className="mb-6 text-sm leading-relaxed"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    "{item.quote}"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/15 text-sm font-bold text-brand">
+                      {item.avatar}
+                    </div>
+                    <div>
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {item.name}
+                      </p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                        {item.role}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -345,12 +356,10 @@ export function LandingPage() {
             ready to earn — CreatorPay has you covered.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link
-              to="/signup"
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-brand-hover hover:shadow-lg hover:shadow-brand/25"
-            >
-              {t("landing.createYourAccount")}
-              <ArrowRight size={18} />
+            <Link to="/signup">
+              <Button className="h-12 px-8 text-base">
+                {t("landing.createYourAccount")} <ArrowRight size={18} />
+              </Button>
             </Link>
           </div>
         </div>

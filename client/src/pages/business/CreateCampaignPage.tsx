@@ -5,6 +5,9 @@ import { createCampaign } from "../../services/campaign.service";
 import { uploadFile } from "../../services/profile.service";
 import { useAuth } from "../../hooks/useAuth";
 import { Spinner } from "../../components/Spinner";
+import { Button } from "../../components/ui/Button";
+import { Card, CardContent, CardTitle } from "../../components/ui/Card";
+import { PageHeader } from "../../components/ui/PageHeader";
 import { ImagePlus, X } from "lucide-react";
 import { getApiErrorMessage } from "../../services/api";
 
@@ -92,23 +95,20 @@ export function CreateCampaignPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          {t("createCampaign.title")}
-        </h1>
-        <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          {t("createCampaign.subtitle")}
-        </p>
-      </div>
+      <PageHeader
+        title={t("createCampaign.title")}
+        subtitle={t("createCampaign.subtitle")}
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="card rounded-xl p-8">
-            {error && (
-              <div className="mb-6 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
-                {error}
-              </div>
-            )}
+          <Card className="rounded-2xl">
+            <CardContent className="p-8">
+              {error && (
+                <div className="mb-6 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+                  {error}
+                </div>
+              )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -306,33 +306,28 @@ export function CreateCampaignPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex items-center justify-center rounded-lg bg-brand px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
-                >
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                <Button type="submit" disabled={loading} className="sm:min-w-48">
                   {loading ? <Spinner size="sm" /> : t("createCampaign.createCampaignBtn")}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={() => navigate(-1)}
-                  className="card rounded-lg px-6 py-2.5 text-sm font-medium transition-colors"
-                  style={{ color: "var(--text-secondary)" }}
                 >
                   {t("common.cancel")}
-                </button>
+                </Button>
               </div>
             </form>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Prize Distribution Preview */}
         <div className="lg:col-span-1">
-          <div className="card sticky top-24 rounded-xl p-6">
-            <h3 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-              {t("createCampaign.prizeDistribution")}
-            </h3>
+          <Card className="sticky top-24 rounded-2xl">
+            <CardContent className="p-6">
+              <CardTitle className="text-lg">{t("createCampaign.prizeDistribution")}</CardTitle>
             {budgetNum > 0 ? (
               <div className="space-y-2">
                 {getDistribution().map((pct, i) => (
@@ -362,7 +357,8 @@ export function CreateCampaignPage() {
                 {t("createCampaign.prizeHint")}
               </p>
             )}
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

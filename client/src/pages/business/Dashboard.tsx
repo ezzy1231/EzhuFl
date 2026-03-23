@@ -4,6 +4,9 @@ import { useTranslation } from "react-i18next";
 import { DashboardCard } from "../../components/DashboardCard";
 import { CampaignCard } from "../../components/CampaignCard";
 import { Spinner } from "../../components/Spinner";
+import { Card, CardContent, CardTitle } from "../../components/ui/Card";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { PageHeader } from "../../components/ui/PageHeader";
 import {
   Trophy,
   DollarSign,
@@ -48,14 +51,12 @@ export function BusinessDashboard() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          {t("businessDashboard.welcomeBack", { name: user?.name || "Business" })}
-        </h1>
-        <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          {t("businessDashboard.subtitle")}
-        </p>
-      </div>
+      <PageHeader
+        title={t("businessDashboard.welcomeBack", {
+          name: user?.name || "Business",
+        })}
+        subtitle={t("businessDashboard.subtitle")}
+      />
 
       <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
@@ -78,39 +79,49 @@ export function BusinessDashboard() {
         />
         <DashboardCard
           title={t("businessDashboard.avgBudget")}
-          value={campaigns.length ? `$${Math.round(totalSpent / campaigns.length).toLocaleString()}` : "$0"}
+          value={
+            campaigns.length
+              ? `$${Math.round(totalSpent / campaigns.length).toLocaleString()}`
+              : "$0"
+          }
           icon={<BarChart3 size={20} />}
           color="rose"
         />
       </div>
 
       {/* Recent Campaigns */}
-      <div className="card rounded-xl p-6">
-        <h2 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-          {t("businessDashboard.recentCampaigns")}
-        </h2>
-        {error && (
-          <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
-            {error}
+      <Card className="rounded-2xl">
+        <CardContent className="p-0">
+          <div className="px-6 pt-6">
+            <CardTitle className="text-lg">{t("businessDashboard.recentCampaigns")}</CardTitle>
           </div>
-        )}
-        {campaigns.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="mb-4 rounded-full bg-brand/10 p-4">
-              <FolderOpen size={32} className="text-brand" />
-            </div>
-            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              {t("businessDashboard.noCampaigns")}
-            </p>
+
+          <div className="px-6 pb-6 pt-4">
+            {error && (
+              <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+                {error}
+              </div>
+            )}
+
+            {campaigns.length === 0 ? (
+              <EmptyState
+                icon={<FolderOpen size={28} className="text-brand" />}
+                description={t("businessDashboard.noCampaigns")}
+              />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {campaigns.slice(0, 6).map((c) => (
+                  <CampaignCard
+                    key={c.id}
+                    campaign={c}
+                    linkPrefix="/business/campaigns"
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {campaigns.slice(0, 6).map((c) => (
-              <CampaignCard key={c.id} campaign={c} linkPrefix="/business/campaigns" />
-            ))}
-          </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

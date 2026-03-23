@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
-import {
-  Users,
-  CheckCircle,
-  Shield,
-} from "lucide-react";
+import { Users, CheckCircle, Shield } from "lucide-react";
+
 import { Spinner } from "../../components/Spinner";
+import { Button } from "../../components/ui/Button";
+import { Badge } from "../../components/ui/Badge";
+import { Card, CardContent, CardTitle } from "../../components/ui/Card";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { PageHeader } from "../../components/ui/PageHeader";
+
 import { getApiErrorMessage } from "../../services/api";
 import * as adminService from "../../services/admin.service";
 import type { InfluencerProfile, InfluencerVerificationStatus } from "../../types";
 
-const STATUS_TABS = [
+type StatusTab = { label: string; value: string };
+
+const STATUS_TABS: StatusTab[] = [
   { label: "All", value: "" },
   { label: "Unverified", value: "unverified" },
   { label: "Basic", value: "basic" },
@@ -17,18 +22,26 @@ const STATUS_TABS = [
 ];
 
 function StatusBadge({ status }: { status: InfluencerVerificationStatus }) {
-  const styles: Record<string, { bg: string; text: string }> = {
-    unverified: { bg: "bg-gray-500/10", text: "text-gray-500" },
-    basic: { bg: "bg-amber-500/10", text: "text-amber-500" },
-    verified: { bg: "bg-emerald-500/10", text: "text-emerald-500" },
-  };
-  const s = styles[status] || styles.unverified;
+  if (status === "verified") {
+    return (
+      <Badge variant="success">
+        <CheckCircle size={12} /> Verified
+      </Badge>
+    );
+  }
+
+  if (status === "basic") {
+    return (
+      <Badge variant="warning">
+        <Shield size={12} /> Basic
+      </Badge>
+    );
+  }
 
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${s.bg} ${s.text}`}>
-      {status === "verified" ? <CheckCircle size={12} /> : <Shield size={12} />}
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
+    <Badge variant="neutral">
+      <Shield size={12} /> Unverified
+    </Badge>
   );
 }
 
@@ -56,15 +69,14 @@ export function InfluencerListPage() {
 
   useEffect(() => {
     fetchInfluencers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeStatus]);
 
   const handleVerify = async (id: string) => {
     setActionLoading(id);
     try {
       const updated = await adminService.reviewInfluencer(id, "verify");
-      setInfluencers((prev) =>
-        prev.map((i) => (i.id === id ? updated : i))
-      );
+      setInfluencers((prev) => prev.map((i) => (i.id === id ? updated : i)));
       setError(null);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to verify influencer"));
@@ -77,12 +89,12 @@ export function InfluencerListPage() {
     setActionLoading(id);
     try {
       const updated = await adminService.reviewInfluencer(id, "unverify");
-      setInfluencers((prev) =>
-        prev.map((i) => (i.id === id ? updated : i))
-      );
+      setInfluencers((prev) => prev.map((i) => (i.id === id ? updated : i)));
       setError(null);
     } catch (err) {
-      setError(getApiErrorMessage(err, "Failed to update influencer verification"));
+      setError(
+        getApiErrorMessage(err, "Failed to update influencer verification")
+      );
     } finally {
       setActionLoading(null);
     }
@@ -90,99 +102,111 @@ export function InfluencerListPage() {
 
   return (
     <div>
-      {error && (
-        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+      <PageHeader
+        title="Influencer Management"
+        subtitle="View and verify creator accounts"
+      />
+
+      {error ? (
+        <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
           {error}
         </div>
-      )}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Influencer Management
-        </h1>
-        <p className="mt-1" style={{ color: "var(--text-secondary)" }}>
-          View and verify creator accounts
-        </p>
-      </div>
+      ) : null}
 
-      {/* Tabs */}
-      <div className="mb-6 flex gap-2 overflow-x-auto">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => setActiveStatus(tab.value)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              activeStatus === tab.value
-                ? "bg-brand text-white"
-                : ""
-            }`}
-            style={
-              activeStatus !== tab.value
-                ? { backgroundColor: "var(--bg-secondary)", color: "var(--text-secondary)" }
-                : undefined
-            }
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Card className="mb-6 rounded-2xl">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex flex-wrap gap-2">
+            {STATUS_TABS.map((tab) => (
+              <Button
+                key={tab.value}
+                size="sm"
+                variant={activeStatus === tab.value ? "primary" : "secondary"}
+                onClick={() => setActiveStatus(tab.value)}
+              >
+                {tab.label}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* List */}
       {loading ? (
         <div className="flex h-40 items-center justify-center">
           <Spinner />
         </div>
       ) : influencers.length === 0 ? (
-        <div className="card rounded-xl p-10 text-center" style={{ color: "var(--text-muted)" }}>
-          <Users size={40} className="mx-auto mb-3 opacity-40" />
-          <p>No influencers found</p>
-        </div>
+        <Card className="rounded-2xl">
+          <CardContent className="p-6">
+            <EmptyState
+              icon={<Users size={28} style={{ color: "var(--text-tertiary)" }} />}
+              title="No influencers found"
+              description="Try switching the status filter."
+            />
+          </CardContent>
+        </Card>
       ) : (
-        <div className="space-y-3">
-          {influencers.map((inf) => (
+        <Card className="rounded-2xl">
+          <CardContent className="p-0">
             <div
-              key={inf.id}
-              className="card flex items-center justify-between rounded-xl p-4"
+              className="border-b px-6 py-5"
+              style={{ borderColor: "var(--border-primary)" }}
             >
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
-                  {inf.display_name?.charAt(0)?.toUpperCase() || "?"}
-                </div>
-                <div>
-                  <p className="font-medium" style={{ color: "var(--text-primary)" }}>
-                    {inf.display_name || "Unnamed Creator"}
-                  </p>
-                  <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                    {inf.city || "—"} &middot; {inf.phone || "—"}
-                    {inf.tiktok_handle && ` · @${inf.tiktok_handle}`}
-                    {inf.instagram_handle && ` · @${inf.instagram_handle}`}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <StatusBadge status={inf.verification_status} />
-                {inf.verification_status !== "verified" && (
-                  <button
-                    onClick={() => handleVerify(inf.id)}
-                    disabled={actionLoading === inf.id}
-                    className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-600 disabled:opacity-50"
-                  >
-                    Verify
-                  </button>
-                )}
-                {inf.verification_status === "verified" && (
-                  <button
-                    onClick={() => handleUnverify(inf.id)}
-                    disabled={actionLoading === inf.id}
-                    className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80 disabled:opacity-50"
-                    style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-secondary)" }}
-                  >
-                    Unverify
-                  </button>
-                )}
-              </div>
+              <CardTitle className="text-base">
+                Influencers · {influencers.length}
+              </CardTitle>
             </div>
-          ))}
-        </div>
+
+            <div className="divide-y" style={{ borderColor: "var(--border-primary)" }}>
+              {influencers.map((inf) => (
+                <div
+                  key={inf.id}
+                  className="flex items-center justify-between gap-4 px-6 py-4"
+                >
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand">
+                      {inf.display_name?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="truncate font-medium" style={{ color: "var(--text-primary)" }}>
+                        {inf.display_name || "Unnamed Creator"}
+                      </p>
+                      <p className="truncate text-sm" style={{ color: "var(--text-muted)" }}>
+                        {inf.city || "—"} · {inf.phone || "—"}
+                        {inf.tiktok_handle ? ` · @${inf.tiktok_handle}` : ""}
+                        {inf.instagram_handle ? ` · @${inf.instagram_handle}` : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <StatusBadge status={inf.verification_status} />
+
+                    {inf.verification_status !== "verified" ? (
+                      <Button
+                        size="sm"
+                        disabled={actionLoading === inf.id}
+                        onClick={() => handleVerify(inf.id)}
+                        className="bg-emerald-600 hover:opacity-90"
+                      >
+                        {actionLoading === inf.id ? <Spinner size="sm" /> : "Verify"}
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        disabled={actionLoading === inf.id}
+                        onClick={() => handleUnverify(inf.id)}
+                      >
+                        {actionLoading === inf.id ? <Spinner size="sm" /> : "Unverify"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
