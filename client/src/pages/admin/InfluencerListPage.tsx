@@ -5,6 +5,7 @@ import {
   Shield,
 } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
+import { getApiErrorMessage } from "../../services/api";
 import * as adminService from "../../services/admin.service";
 import type { InfluencerProfile, InfluencerVerificationStatus } from "../../types";
 
@@ -36,13 +37,20 @@ export function InfluencerListPage() {
   const [influencers, setInfluencers] = useState<InfluencerProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchInfluencers = () => {
     setLoading(true);
     adminService
       .getInfluencers(activeStatus || undefined)
-      .then(setInfluencers)
-      .catch(console.error)
+      .then((value) => {
+        setInfluencers(value);
+        setError(null);
+      })
+      .catch((err) => {
+        setInfluencers([]);
+        setError(getApiErrorMessage(err, "Failed to load influencers"));
+      })
       .finally(() => setLoading(false));
   };
 
@@ -57,8 +65,9 @@ export function InfluencerListPage() {
       setInfluencers((prev) =>
         prev.map((i) => (i.id === id ? updated : i))
       );
+      setError(null);
     } catch (err) {
-      console.error(err);
+      setError(getApiErrorMessage(err, "Failed to verify influencer"));
     } finally {
       setActionLoading(null);
     }
@@ -71,8 +80,9 @@ export function InfluencerListPage() {
       setInfluencers((prev) =>
         prev.map((i) => (i.id === id ? updated : i))
       );
+      setError(null);
     } catch (err) {
-      console.error(err);
+      setError(getApiErrorMessage(err, "Failed to update influencer verification"));
     } finally {
       setActionLoading(null);
     }
@@ -80,6 +90,11 @@ export function InfluencerListPage() {
 
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
           Influencer Management

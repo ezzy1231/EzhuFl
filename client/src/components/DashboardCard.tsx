@@ -23,7 +23,7 @@ export function DashboardCard({
   color = "brand",
 }: DashboardCardProps) {
   return (
-    <div className="card rounded-xl p-6 transition-all duration-200 hover:scale-[1.02]">
+    <div className="card p-6">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>

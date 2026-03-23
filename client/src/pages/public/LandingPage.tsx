@@ -11,6 +11,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { mockTestimonials } from "../../data/mockData";
+import { getApiErrorMessage } from "../../services/api";
 import { getAllCampaigns } from "../../services/campaign.service";
 import { getPublicStats, type PublicStats } from "../../services/stats.service";
 import { CampaignCard } from "../../components/CampaignCard";
@@ -19,15 +20,22 @@ import type { Campaign } from "../../types";
 export function LandingPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [stats, setStats] = useState<PublicStats | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
     getAllCampaigns()
       .then((c) => setCampaigns(c))
-      .catch(() => setCampaigns([]));
+      .catch((err) => {
+        setCampaigns([]);
+        setError((current) => current || getApiErrorMessage(err, "Failed to load campaigns"));
+      });
     getPublicStats()
       .then((s) => setStats(s))
-      .catch(() => setStats(null));
+      .catch((err) => {
+        setStats(null);
+        setError((current) => current || getApiErrorMessage(err, "Failed to load stats"));
+      });
   }, []);
 
   const activeCampaigns = campaigns.filter((c) => c.status === "ACTIVE");
@@ -37,18 +45,25 @@ export function LandingPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-brand/8 blur-[120px]" />
+          <div className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-brand/10 blur-[120px] animate-fade-in opacity-70" />
+          <div className="absolute right-0 top-32 h-[400px] w-[400px] rounded-full bg-purple-500/10 blur-[120px] animate-fade-in opacity-50" />
+          <div className="absolute left-0 top-64 h-[400px] w-[400px] rounded-full bg-blue-500/10 blur-[120px] animate-fade-in opacity-50" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 pb-20 pt-24 text-center sm:pt-32">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-sm font-medium text-brand">
+          {error && (
+            <div className="mx-auto mb-6 max-w-2xl rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+              {error}
+            </div>
+          )}
+          <div className="mb-6 inline-flex animate-slide-up items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-sm font-medium text-brand">
             <Trophy size={14} />
             {t("landing.badge")}
           </div>
 
           <h1
-            className="mx-auto max-w-4xl text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl lg:text-7xl"
-            style={{ color: "var(--text-primary)" }}
+            className="mx-auto max-w-5xl animate-slide-up text-5xl font-extrabold leading-tight tracking-tighter sm:text-6xl lg:text-7xl"
+            style={{ color: "var(--text-primary)", animationDelay: "100ms", animationFillMode: "both" }}
           >
             {t("landing.heroTitle1")}{" "}
             <span className="bg-gradient-to-r from-brand to-purple-400 bg-clip-text text-transparent">
@@ -57,31 +72,30 @@ export function LandingPage() {
           </h1>
 
           <p
-            className="mx-auto mt-6 max-w-2xl text-lg"
-            style={{ color: "var(--text-secondary)" }}
+            className="mx-auto mt-8 max-w-2xl animate-slide-up text-lg leading-relaxed"
+            style={{ color: "var(--text-secondary)", animationDelay: "200ms", animationFillMode: "both" }}
           >
             {t("landing.heroSubtitle")}
           </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="mt-10 flex animate-slide-up flex-col items-center justify-center gap-4 sm:flex-row" style={{ animationDelay: "300ms", animationFillMode: "both" }}>
             <Link
               to="/signup"
-              className="inline-flex items-center gap-2 rounded-xl bg-brand px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-brand-hover hover:shadow-lg hover:shadow-brand/25"
+              className="btn btn-primary px-8 py-4 text-base"
             >
               {t("landing.startEarning")}
               <ArrowRight size={18} />
             </Link>
             <Link
               to="/signup"
-              className="card inline-flex items-center gap-2 rounded-xl px-8 py-3.5 text-base font-semibold transition-colors"
-              style={{ color: "var(--text-primary)" }}
+              className="btn btn-secondary px-8 py-4 text-base"
             >
               {t("landing.imBusiness")}
             </Link>
           </div>
 
           {/* Social proof */}
-          <div className="mt-12 flex items-center justify-center gap-6">
+          <div className="mt-12 flex animate-slide-up items-center justify-center gap-6" style={{ animationDelay: "400ms", animationFillMode: "both" }}>
             <div className="flex -space-x-2">
               {["AT", "SK", "DH", "HG", "YT"].map((initials, i) => (
                 <div
@@ -96,7 +110,7 @@ export function LandingPage() {
                 </div>
               ))}
             </div>
-            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+            <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
               <span className="font-semibold" style={{ color: "var(--text-primary)" }}>
                 {t("landing.creatorsCount")}
               </span>{" "}
@@ -108,7 +122,7 @@ export function LandingPage() {
 
       {/* How It Works */}
       <section
-        className="border-t py-24"
+        className="border-t py-32"
         style={{ borderColor: "var(--border-primary)" }}
       >
         <div className="mx-auto max-w-7xl px-6">
@@ -145,7 +159,7 @@ export function LandingPage() {
                 icon: <DollarSign size={24} />,
               },
             ].map((item) => (
-              <div key={item.step} className="card group rounded-xl p-8 transition-all duration-300">
+              <div key={item.step} className="card group p-8">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
                   {item.icon}
                 </div>
@@ -172,7 +186,7 @@ export function LandingPage() {
 
       {/* Featured Campaigns */}
       <section
-        className="border-t py-24"
+        className="border-t py-32"
         style={{
           borderColor: "var(--border-primary)",
           backgroundColor: "var(--bg-primary)",
@@ -221,7 +235,7 @@ export function LandingPage() {
 
       {/* Stats */}
       <section
-        className="border-t py-24"
+        className="border-t py-32"
         style={{
           borderColor: "var(--border-primary)",
           backgroundColor: "var(--bg-primary)",
@@ -259,7 +273,7 @@ export function LandingPage() {
 
       {/* Testimonials */}
       <section
-        className="border-t py-24"
+        className="border-t py-32"
         style={{ borderColor: "var(--border-primary)" }}
       >
         <div className="mx-auto max-w-7xl px-6">
@@ -313,7 +327,7 @@ export function LandingPage() {
 
       {/* CTA */}
       <section
-        className="border-t py-24"
+        className="border-t py-32"
         style={{
           borderColor: "var(--border-primary)",
           backgroundColor: "var(--bg-primary)",

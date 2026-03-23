@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Spinner } from "../../components/Spinner";
 import { Trophy } from "lucide-react";
 import type { UserRole } from "../../types";
+import { getApiErrorMessage } from "../../services/api";
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -56,8 +57,8 @@ export function SignupPage() {
             : "/influencer/dashboard";
         navigate(path);
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to sign up");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to sign up"));
     } finally {
       setLoading(false);
     }
@@ -90,13 +91,14 @@ export function SignupPage() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-1/3 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-brand/8 blur-[100px]" />
+        <div className="absolute left-1/2 top-1/3 h-[440px] w-[640px] -translate-x-1/2 rounded-full bg-brand/10 blur-[110px]" />
+        <div className="absolute left-[8%] top-20 h-52 w-52 rounded-full bg-blue-500/10 blur-[96px]" />
       </div>
 
       <div className="relative w-full max-w-md">
-        <div className="card rounded-2xl p-8 shadow-xl">
+        <div className="surface-panel p-8 sm:p-9">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-blue-500 shadow-lg shadow-brand/20">
               <Trophy size={24} className="text-white" />
             </div>
             <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
@@ -122,42 +124,26 @@ export function SignupPage() {
               >
                 {t("signup.iAmA")}
               </label>
-              <div
-                className="flex rounded-lg border p-1"
-                style={{
-                  borderColor: "var(--border-primary)",
-                  backgroundColor: "var(--bg-secondary)",
-                }}
-              >
+              <div className="segmented-control">
                 <button
                   type="button"
                   onClick={() => setRole("INFLUENCER")}
-                  className={`flex-1 rounded-md py-2 text-sm font-medium transition-all ${
+                  className={`segmented-option ${
                     role === "INFLUENCER"
-                      ? "bg-brand text-white shadow"
-                      : ""
+                      ? "segmented-option-active"
+                      : "segmented-option-inactive"
                   }`}
-                  style={
-                    role !== "INFLUENCER"
-                      ? { color: "var(--text-secondary)" }
-                      : undefined
-                  }
                 >
                   {t("common.creator")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setRole("BUSINESS")}
-                  className={`flex-1 rounded-md py-2 text-sm font-medium transition-all ${
+                  className={`segmented-option ${
                     role === "BUSINESS"
-                      ? "bg-brand text-white shadow"
-                      : ""
+                      ? "segmented-option-active"
+                      : "segmented-option-inactive"
                   }`}
-                  style={
-                    role !== "BUSINESS"
-                      ? { color: "var(--text-secondary)" }
-                      : undefined
-                  }
                 >
                   {t("common.business")}
                 </button>
@@ -219,7 +205,7 @@ export function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-lg bg-brand py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+              className="btn btn-primary w-full"
             >
               {loading ? <Spinner size="sm" /> : t("signup.createAccountBtn")}
             </button>
@@ -228,7 +214,7 @@ export function SignupPage() {
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1" style={{ backgroundColor: "var(--border-primary)" }} />
-            <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("common.or")}</span>
+            <span className="text-xs font-medium uppercase tracking-[0.18em]" style={{ color: "var(--text-tertiary)" }}>{t("common.or")}</span>
             <div className="h-px flex-1" style={{ backgroundColor: "var(--border-primary)" }} />
           </div>
 
@@ -239,18 +225,13 @@ export function SignupPage() {
               setGoogleLoading(true);
               try {
                 await signInWithGoogle();
-              } catch (err: any) {
-                setError(err.message || "Failed to sign in with Google");
+              } catch (err) {
+                setError(getApiErrorMessage(err, "Failed to sign in with Google"));
                 setGoogleLoading(false);
               }
             }}
             disabled={googleLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-lg border py-2.5 text-sm font-semibold transition-colors hover:opacity-80 disabled:opacity-50"
-            style={{
-              borderColor: "var(--border-primary)",
-              color: "var(--text-primary)",
-              backgroundColor: "var(--bg-secondary)",
-            }}
+            className="btn btn-social"
           >
             {googleLoading ? <Spinner size="sm" /> : <><GoogleIcon className="h-5 w-5" /> {t("signup.continueWithGoogle")}</>}
           </button>
@@ -263,12 +244,7 @@ export function SignupPage() {
               signInWithTikTok();
             }}
             disabled={tiktokLoading}
-            className="mt-3 flex w-full items-center justify-center gap-3 rounded-lg border py-2.5 text-sm font-semibold transition-colors hover:opacity-80 disabled:opacity-50"
-            style={{
-              borderColor: "var(--border-primary)",
-              color: "var(--text-primary)",
-              backgroundColor: "var(--bg-secondary)",
-            }}
+            className="btn btn-social mt-3"
           >
             {tiktokLoading ? <Spinner size="sm" /> : <><TikTokIcon className="h-5 w-5" /> {t("signup.continueWithTiktok")}</>}
           </button>

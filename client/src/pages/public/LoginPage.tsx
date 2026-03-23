@@ -4,6 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "../../components/Spinner";
 import { Trophy } from "lucide-react";
+import { getApiErrorMessage } from "../../services/api";
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -60,8 +61,8 @@ export function LoginPage() {
           ? "/business/dashboard"
           : "/influencer/dashboard";
       navigate(path, { replace: true });
-    } catch (err: any) {
-      setError(err.message || "Failed to sign in");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to sign in"));
     } finally {
       setLoading(false);
     }
@@ -72,8 +73,8 @@ export function LoginPage() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-    } catch (err: any) {
-      setError(err.message || "Failed to sign in with Google");
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to sign in with Google"));
       setGoogleLoading(false);
     }
   };
@@ -81,13 +82,14 @@ export function LoginPage() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-1/3 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-brand/8 blur-[100px]" />
+        <div className="absolute left-1/2 top-1/3 h-[420px] w-[620px] -translate-x-1/2 rounded-full bg-brand/10 blur-[110px]" />
+        <div className="absolute right-[10%] top-24 h-56 w-56 rounded-full bg-blue-500/10 blur-[100px]" />
       </div>
 
       <div className="relative w-full max-w-md">
-        <div className="card rounded-2xl p-8 shadow-xl">
+        <div className="surface-panel p-8 sm:p-9">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-blue-500 shadow-lg shadow-brand/20">
               <Trophy size={24} className="text-white" />
             </div>
             <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
@@ -142,7 +144,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-lg bg-brand py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+              className="btn btn-primary w-full"
             >
               {loading ? <Spinner size="sm" /> : t("login.signIn")}
             </button>
@@ -151,7 +153,7 @@ export function LoginPage() {
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1" style={{ backgroundColor: "var(--border-primary)" }} />
-            <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{t("common.or")}</span>
+            <span className="text-xs font-medium uppercase tracking-[0.18em]" style={{ color: "var(--text-tertiary)" }}>{t("common.or")}</span>
             <div className="h-px flex-1" style={{ backgroundColor: "var(--border-primary)" }} />
           </div>
 
@@ -159,12 +161,7 @@ export function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-lg border py-2.5 text-sm font-semibold transition-colors hover:opacity-80 disabled:opacity-50"
-            style={{
-              borderColor: "var(--border-primary)",
-              color: "var(--text-primary)",
-              backgroundColor: "var(--bg-secondary)",
-            }}
+            className="btn btn-social"
           >
             {googleLoading ? <Spinner size="sm" /> : <><GoogleIcon className="h-5 w-5" /> {t("login.continueWithGoogle")}</>}
           </button>
@@ -177,12 +174,7 @@ export function LoginPage() {
               signInWithTikTok();
             }}
             disabled={tiktokLoading}
-            className="mt-3 flex w-full items-center justify-center gap-3 rounded-lg border py-2.5 text-sm font-semibold transition-colors hover:opacity-80 disabled:opacity-50"
-            style={{
-              borderColor: "var(--border-primary)",
-              color: "var(--text-primary)",
-              backgroundColor: "var(--bg-secondary)",
-            }}
+            className="btn btn-social mt-3"
           >
             {tiktokLoading ? <Spinner size="sm" /> : <><TikTokIcon className="h-5 w-5" /> {t("login.continueWithTiktok")}</>}
           </button>

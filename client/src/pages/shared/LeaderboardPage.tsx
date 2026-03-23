@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Trophy, ArrowLeft, ExternalLink, BarChart3 } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
 import { useAuth } from "../../hooks/useAuth";
+import { getApiErrorMessage } from "../../services/api";
 import {
   getAllCampaigns,
   getLeaderboard,
@@ -30,33 +31,56 @@ export function SharedLeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [lbLoading, setLbLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [brokenPhotos, setBrokenPhotos] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (id) {
+    async function load() {
       setLoading(true);
-      Promise.all([
-        getCampaignById(id).catch(() => null),
-        getLeaderboard(id).catch(() => []),
-      ])
-        .then(([c, lb]) => {
-          setSelectedCampaign(c);
-          setLeaderboard(lb);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      getAllCampaigns()
-        .then((c) => setCampaigns(c.filter((x) => x.status === "ACTIVE" || x.status === "COMPLETED")))
-        .finally(() => setLoading(false));
+      setError(null);
+
+      if (id) {
+        try {
+          const campaign = await getCampaignById(id);
+          setSelectedCampaign(campaign);
+        } catch (err) {
+          setSelectedCampaign(null);
+          setError(getApiErrorMessage(err, "Failed to load campaign"));
+        }
+
+        try {
+          const leaderboardData = await getLeaderboard(id);
+          setLeaderboard(leaderboardData);
+        } catch (err) {
+          setLeaderboard([]);
+          setError((current) => current || getApiErrorMessage(err, "Failed to load leaderboard"));
+        }
+      } else {
+        try {
+          const allCampaigns = await getAllCampaigns();
+          setCampaigns(allCampaigns.filter((x) => x.status === "ACTIVE" || x.status === "COMPLETED"));
+        } catch (err) {
+          setCampaigns([]);
+          setError(getApiErrorMessage(err, "Failed to load campaigns"));
+        }
+      }
+
+      setLoading(false);
     }
+
+    void load();
   }, [id]);
 
   function selectCampaign(c: Campaign) {
     setSelectedCampaign(c);
     setLbLoading(true);
+    setError(null);
     getLeaderboard(c.id)
       .then(setLeaderboard)
-      .catch(() => setLeaderboard([]))
+      .catch((err) => {
+        setLeaderboard([]);
+        setError(getApiErrorMessage(err, "Failed to load leaderboard"));
+      })
       .finally(() => setLbLoading(false));
   }
 
@@ -65,9 +89,12 @@ export function SharedLeaderboardPage() {
     setRefreshing(true);
     try {
       await refreshCampaignMetrics(selectedCampaign.id);
-      const lb = await getLeaderboard(selectedCampaign.id).catch(() => []);
+      const lb = await getLeaderboard(selectedCampaign.id);
       setLeaderboard(lb);
-    } catch {}
+      setError(null);
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to refresh leaderboard"));
+    }
     setRefreshing(false);
   }
 
@@ -83,6 +110,11 @@ export function SharedLeaderboardPage() {
   if (!id && !selectedCampaign) {
     return (
       <div>
+        {error && (
+          <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+            {error}
+          </div>
+        )}
         <h1 className="mb-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
           {t("leaderboardPage.liveLeaderboard")}
         </h1>
@@ -161,6 +193,11 @@ export function SharedLeaderboardPage() {
   // ── Single campaign leaderboard ──
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
       {!id && (
         <button
           onClick={() => {
@@ -170,6 +207,7 @@ export function SharedLeaderboardPage() {
               setLoading(true);
               getAllCampaigns()
                 .then((c) => setCampaigns(c.filter((x) => x.status === "ACTIVE" || x.status === "COMPLETED")))
+                .catch((err) => setError(getApiErrorMessage(err, "Failed to load campaigns")))
                 .finally(() => setLoading(false));
             }
           }}

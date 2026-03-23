@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
+import { getApiErrorMessage } from "../../services/api";
 import * as adminService from "../../services/admin.service";
 import type { BusinessProfile } from "../../types";
 
@@ -25,13 +26,20 @@ export function BusinessDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
     adminService
       .getBusinessDetail(id)
-      .then(setBusiness)
-      .catch(console.error)
+      .then((value) => {
+        setBusiness(value);
+        setError(null);
+      })
+      .catch((err) => {
+        setBusiness(null);
+        setError(getApiErrorMessage(err, "Failed to load business details"));
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -41,8 +49,9 @@ export function BusinessDetailPage() {
     try {
       const updated = await adminService.reviewBusiness(business.id, "approve");
       setBusiness(updated);
+      setError(null);
     } catch (err) {
-      console.error(err);
+      setError(getApiErrorMessage(err, "Failed to approve business"));
     } finally {
       setActionLoading(false);
     }
@@ -59,8 +68,9 @@ export function BusinessDetailPage() {
       );
       setBusiness(updated);
       setShowRejectForm(false);
+      setError(null);
     } catch (err) {
-      console.error(err);
+      setError(getApiErrorMessage(err, "Failed to reject business"));
     } finally {
       setActionLoading(false);
     }
@@ -75,8 +85,9 @@ export function BusinessDetailPage() {
         "Policy violation"
       );
       setBusiness(updated);
+      setError(null);
     } catch (err) {
-      console.error(err);
+      setError(getApiErrorMessage(err, "Failed to suspend business"));
     } finally {
       setActionLoading(false);
     }
@@ -114,6 +125,11 @@ export function BusinessDetailPage() {
 
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
       {/* Header */}
       <button
         onClick={() => navigate(-1)}

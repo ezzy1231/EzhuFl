@@ -6,6 +6,7 @@ import { uploadFile } from "../../services/profile.service";
 import { useAuth } from "../../hooks/useAuth";
 import { Spinner } from "../../components/Spinner";
 import { ImagePlus, X } from "lucide-react";
+import { getApiErrorMessage } from "../../services/api";
 
 const PLATFORM_KEYS: Record<string, string> = {
   TIKTOK: "createCampaign.tiktok",
@@ -72,10 +73,8 @@ export function CreateCampaignPage() {
 
       });
       navigate(`/business/campaigns/${campaign.id}`);
-    } catch (err: any) {
-      setError(
-        err.response?.data?.error || err.message || t("createCampaign.failedCreate")
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, t("createCampaign.failedCreate")));
     } finally {
       setLoading(false);
     }

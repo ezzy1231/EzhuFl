@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { authMiddleware, adminOnly } from "../middleware/auth.js";
 import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from "../middleware/validation.js";
+import {
   getAdminStats,
   getBusinesses,
   getPendingBusinesses,
@@ -11,6 +16,14 @@ import {
   getInfluencerDetail,
   reviewInfluencer,
 } from "../controllers/admin.controller.js";
+import {
+  adminBusinessListQuerySchema,
+  adminBusinessReviewSchema,
+  adminInfluencerListQuerySchema,
+  adminInfluencerReviewSchema,
+  adminProfileIdParamsSchema,
+  adminSuspendBusinessSchema,
+} from "../validation/admin.validation.js";
 
 const router = Router();
 
@@ -21,15 +34,30 @@ router.use(authMiddleware, adminOnly);
 router.get("/stats", getAdminStats);
 
 // Business verification
-router.get("/businesses", getBusinesses);
+router.get("/businesses", validateQuery(adminBusinessListQuerySchema), getBusinesses);
 router.get("/businesses/pending", getPendingBusinesses);
-router.get("/businesses/:id", getBusinessDetail);
-router.post("/businesses/:id/review", reviewBusiness);
-router.post("/businesses/:id/suspend", suspendBusiness);
+router.get("/businesses/:id", validateParams(adminProfileIdParamsSchema), getBusinessDetail);
+router.post(
+  "/businesses/:id/review",
+  validateParams(adminProfileIdParamsSchema),
+  validateBody(adminBusinessReviewSchema),
+  reviewBusiness
+);
+router.post(
+  "/businesses/:id/suspend",
+  validateParams(adminProfileIdParamsSchema),
+  validateBody(adminSuspendBusinessSchema),
+  suspendBusiness
+);
 
 // Influencer verification
-router.get("/influencers", getInfluencers);
-router.get("/influencers/:id", getInfluencerDetail);
-router.post("/influencers/:id/review", reviewInfluencer);
+router.get("/influencers", validateQuery(adminInfluencerListQuerySchema), getInfluencers);
+router.get("/influencers/:id", validateParams(adminProfileIdParamsSchema), getInfluencerDetail);
+router.post(
+  "/influencers/:id/review",
+  validateParams(adminProfileIdParamsSchema),
+  validateBody(adminInfluencerReviewSchema),
+  reviewInfluencer
+);
 
 export default router;

@@ -11,6 +11,7 @@ import {
   TrendingUp,
   FolderOpen,
 } from "lucide-react";
+import { getApiErrorMessage } from "../../services/api";
 import { getAllCampaigns } from "../../services/campaign.service";
 import type { Campaign } from "../../types";
 
@@ -19,11 +20,18 @@ export function InfluencerDashboard() {
   const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getAllCampaigns()
-      .then((c) => setCampaigns(c))
-      .catch(() => setCampaigns([]))
+      .then((c) => {
+        setCampaigns(c);
+        setError(null);
+      })
+      .catch((err) => {
+        setCampaigns([]);
+        setError(getApiErrorMessage(err, "Failed to load campaigns"));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -81,6 +89,11 @@ export function InfluencerDashboard() {
         <h2 className="mb-4 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
           {t("influencerDashboard.availableCampaigns")}
         </h2>
+        {error && (
+          <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+            {error}
+          </div>
+        )}
         {activeCampaigns.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="mb-4 rounded-full bg-brand/10 p-4">

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
 import { getCampaignById, getLeaderboard, joinCampaign, checkJoined, submitVideo, refreshCampaignMetrics } from "../../services/campaign.service";
+import { getApiErrorMessage, isApiError } from "../../services/api";
 import { supabase } from "../../lib/supabase";
 import type { Campaign, LeaderboardEntry } from "../../types";
 
@@ -22,6 +23,7 @@ export function CampaignDetailsPage() {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [videoUrl, setVideoUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -34,17 +36,40 @@ export function CampaignDetailsPage() {
 
   useEffect(() => {
     if (!id) return;
-    Promise.all([
-      getCampaignById(id).catch(() => null),
-      getLeaderboard(id).catch(() => []),
-      checkJoined(id).catch(() => false),
-    ])
-      .then(([c, lb, joined]) => {
-        setCampaign(c);
-        setLeaderboard(lb);
+    const campaignId = id;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const campaignData = await getCampaignById(campaignId);
+        setCampaign(campaignData);
+      } catch (err) {
+        setCampaign(null);
+        setError(getApiErrorMessage(err, "Failed to load campaign"));
+      }
+
+      try {
+        const leaderboardData = await getLeaderboard(campaignId);
+        setLeaderboard(leaderboardData);
+      } catch (err) {
+        setLeaderboard([]);
+        setError((current) => current || getApiErrorMessage(err, "Failed to load leaderboard"));
+      }
+
+      try {
+        const joined = await checkJoined(campaignId);
         setHasJoined(joined);
-      })
-      .finally(() => setLoading(false));
+      } catch (err) {
+        setHasJoined(false);
+        setError((current) => current || getApiErrorMessage(err, "Failed to check campaign participation"));
+      }
+
+      setLoading(false);
+    }
+
+    void load();
   }, [id]);
 
   if (loading) {
@@ -93,8 +118,8 @@ export function CampaignDetailsPage() {
     try {
       await joinCampaign(campaign.id);
       setHasJoined(true);
-    } catch (err: any) {
-      if (err?.response?.status === 409) {
+    } catch (err) {
+      if (isApiError(err) && err.status === 409) {
         setHasJoined(true);
       }
     } finally {
@@ -111,10 +136,11 @@ export function CampaignDetailsPage() {
       setSubmitted(true);
       setVideoUrl("");
       // Refresh leaderboard
-      const lb = await getLeaderboard(campaign.id).catch(() => []);
+      const lb = await getLeaderboard(campaign.id);
       setLeaderboard(lb);
-    } catch (err: any) {
-      setSubmitError(err?.response?.data?.error || err.message || "Failed to submit");
+      setError(null);
+    } catch (err) {
+      setSubmitError(getApiErrorMessage(err, "Failed to submit"));
     } finally {
       setSubmitting(false);
     }
@@ -122,6 +148,11 @@ export function CampaignDetailsPage() {
 
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
       <Link
         to="/influencer/campaigns"
         className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
@@ -356,9 +387,12 @@ export function CampaignDetailsPage() {
                     setRefreshing(true);
                     try {
                       await refreshCampaignMetrics(campaign.id);
-                      const lb = await getLeaderboard(campaign.id).catch(() => []);
+                      const lb = await getLeaderboard(campaign.id);
                       setLeaderboard(lb);
-                    } catch {}
+                      setError(null);
+                    } catch (err) {
+                      setError(getApiErrorMessage(err, "Failed to refresh leaderboard"));
+                    }
                     setRefreshing(false);
                   }}
                   disabled={refreshing}

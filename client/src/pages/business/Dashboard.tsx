@@ -11,6 +11,7 @@ import {
   BarChart3,
   FolderOpen,
 } from "lucide-react";
+import { getApiErrorMessage } from "../../services/api";
 import { getMyCampaigns } from "../../services/campaign.service";
 import type { Campaign } from "../../types";
 
@@ -27,9 +28,9 @@ export function BusinessDashboard() {
         setCampaigns(c);
         setError(null);
       })
-      .catch((err: any) => {
+      .catch((err) => {
         setCampaigns([]);
-        setError(err?.response?.data?.error || err?.message || "Failed to load campaigns");
+        setError(getApiErrorMessage(err, "Failed to load campaigns"));
       })
       .finally(() => setLoading(false));
   }, []);

@@ -1,8 +1,9 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import type { AuthenticatedRequest } from "../middleware/auth.js";
 import type { CreateProfileDto } from "../types/index.js";
 import { supabase } from "../config/supabase.js";
 import * as profileService from "../services/profile.service.js";
+import { AppError, toAppError } from "../lib/errors.js";
 
 /**
  * POST /api/auth/profile — Create or update user profile after signup
@@ -10,21 +11,12 @@ import * as profileService from "../services/profile.service.js";
  */
 export async function createProfile(
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> {
   try {
     const { user } = req as AuthenticatedRequest;
     const { name, role } = req.body as CreateProfileDto;
-
-    if (!name || !role) {
-      res.status(400).json({ error: "name and role are required" });
-      return;
-    }
-
-    if (!["BUSINESS", "INFLUENCER"].includes(role)) {
-      res.status(400).json({ error: "role must be BUSINESS or INFLUENCER" });
-      return;
-    }
 
     const { data, error } = await supabase
       .from("users")
@@ -41,8 +33,7 @@ export async function createProfile(
       .single();
 
     if (error) {
-      console.error("Create profile error:", error);
-      res.status(500).json({ error: "Failed to create profile" });
+      next(new AppError(500, "Failed to create profile", "INTERNAL_SERVER_ERROR", undefined, false));
       return;
     }
 
@@ -90,15 +81,14 @@ export async function createProfile(
 
     res.status(200).json({ user: data });
   } catch (err) {
-    console.error("Create profile error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    next(toAppError(err));
   }
 }
 
 /**
  * GET /api/auth/me — Get the current user's profile + verification status + extended profile
  */
-export async function getMe(req: Request, res: Response): Promise<void> {
+export async function getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { user } = req as AuthenticatedRequest;
 
@@ -129,8 +119,7 @@ export async function getMe(req: Request, res: Response): Promise<void> {
       extendedProfile,
     });
   } catch (err) {
-    console.error("Get me error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    next(toAppError(err));
   }
 }
 
@@ -139,13 +128,14 @@ export async function getMe(req: Request, res: Response): Promise<void> {
  */
 export async function updateBusinessProfile(
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> {
   try {
     const { user } = req as AuthenticatedRequest;
 
     if (user.role !== "BUSINESS") {
-      res.status(403).json({ error: "Business account required" });
+      next(new AppError(403, "Business account required", "FORBIDDEN"));
       return;
     }
 
@@ -175,8 +165,7 @@ export async function updateBusinessProfile(
 
     res.status(200).json({ profile });
   } catch (err) {
-    console.error("Update business profile error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    next(toAppError(err));
   }
 }
 
@@ -185,13 +174,14 @@ export async function updateBusinessProfile(
  */
 export async function updateInfluencerProfile(
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> {
   try {
     const { user } = req as AuthenticatedRequest;
 
     if (user.role !== "INFLUENCER") {
-      res.status(403).json({ error: "Influencer account required" });
+      next(new AppError(403, "Influencer account required", "FORBIDDEN"));
       return;
     }
 
@@ -219,8 +209,6 @@ export async function updateInfluencerProfile(
 
     res.status(200).json({ profile });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : JSON.stringify(err);
-    console.error("Update influencer profile error:", msg, err);
-    res.status(500).json({ error: "Internal server error", detail: msg });
+    next(toAppError(err));
   }
 }

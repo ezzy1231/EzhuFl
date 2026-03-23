@@ -2,18 +2,26 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Building2, Users, Trophy, Clock, ChevronRight } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
+import { getApiErrorMessage } from "../../services/api";
 import * as adminService from "../../services/admin.service";
 import type { AdminStats } from "../../types";
 
 export function AdminDashboard() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     adminService
       .getAdminStats()
-      .then(setStats)
-      .catch(console.error)
+      .then((value) => {
+        setStats(value);
+        setError(null);
+      })
+      .catch((err) => {
+        setStats(null);
+        setError(getApiErrorMessage(err, "Failed to load admin stats"));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -62,6 +70,11 @@ export function AdminDashboard() {
 
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
       <div className="mb-8">
         <h1
           className="text-2xl font-bold"

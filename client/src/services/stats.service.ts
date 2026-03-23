@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const baseURL = import.meta.env.VITE_API_URL || "";
+import api from "./api";
 
 export interface PublicStats {
   totalCampaigns: number;
@@ -10,6 +8,6 @@ export interface PublicStats {
 }
 
 export async function getPublicStats(): Promise<PublicStats> {
-  const { data } = await axios.get<PublicStats>(`${baseURL}/api/stats`);
+  const { data } = await api.get<PublicStats>("/api/stats");
   return data;
 }

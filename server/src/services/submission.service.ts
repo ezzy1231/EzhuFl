@@ -1,7 +1,34 @@
 import { supabase } from "../config/supabase.js";
+import { AppError } from "../lib/errors.js";
 import { calculateScore } from "../utils/score.js";
 import { fetchVideoMetrics } from "./social-media.service.js";
-import type { DbSubmission, CreateSubmissionDto } from "../types/index.js";
+import type {
+  DbSubmission,
+  CreateSubmissionDto,
+  UserRole,
+} from "../types/index.js";
+
+async function assertCanManageCampaignSubmissions(
+  campaignId: string,
+  userId: string,
+  role: UserRole
+): Promise<void> {
+  if (role === "ADMIN") {
+    return;
+  }
+
+  const { data: campaign, error } = await supabase
+    .from("campaigns")
+    .select("id")
+    .eq("id", campaignId)
+    .eq("business_id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!campaign) {
+    throw new AppError(403, "Not authorized to manage submissions for this campaign", "FORBIDDEN");
+  }
+}
 
 export async function createSubmission(
   userId: string,
@@ -16,7 +43,7 @@ export async function createSubmission(
     .single();
 
   if (!participant) {
-    throw new Error("You must join the campaign before submitting");
+    throw new AppError(403, "You must join the campaign before submitting", "FORBIDDEN");
   }
 
   // Verify campaign is active
@@ -27,7 +54,7 @@ export async function createSubmission(
     .single();
 
   if (!campaign || campaign.status !== "ACTIVE") {
-    throw new Error("Campaign is not active");
+    throw new AppError(409, "Campaign is not active", "CONFLICT");
   }
 
   // Try to auto-fetch metrics from the platform API
@@ -80,7 +107,9 @@ export async function getSubmissionsByCampaign(
  * Refresh the metrics for a single submission by re-fetching from the API.
  */
 export async function refreshSubmissionMetrics(
-  submissionId: string
+  submissionId: string,
+  userId: string,
+  role: UserRole
 ): Promise<DbSubmission> {
   const { data: sub, error: fetchError } = await supabase
     .from("submissions")
@@ -88,7 +117,13 @@ export async function refreshSubmissionMetrics(
     .eq("id", submissionId)
     .single();
 
-  if (fetchError || !sub) throw new Error("Submission not found");
+  if (fetchError || !sub) {
+    throw new AppError(404, "Submission not found", "NOT_FOUND");
+  }
+
+  if (role !== "ADMIN" && sub.user_id !== userId) {
+    await assertCanManageCampaignSubmissions(sub.campaign_id, userId, role);
+  }
 
   const metrics = await fetchVideoMetrics(sub.video_url, sub.platform);
   if (!metrics) {
@@ -117,14 +152,18 @@ export async function refreshSubmissionMetrics(
  * Refresh metrics for ALL submissions in a campaign.
  */
 export async function refreshCampaignMetrics(
-  campaignId: string
+  campaignId: string,
+  userId: string,
+  role: UserRole
 ): Promise<DbSubmission[]> {
+  await assertCanManageCampaignSubmissions(campaignId, userId, role);
+
   const submissions = await getSubmissionsByCampaign(campaignId);
 
   const updated: DbSubmission[] = [];
   for (const sub of submissions) {
     try {
-      const refreshed = await refreshSubmissionMetrics(sub.id);
+      const refreshed = await refreshSubmissionMetrics(sub.id, userId, role);
       updated.push(refreshed);
     } catch {
       updated.push(sub);

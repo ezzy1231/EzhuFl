@@ -9,6 +9,8 @@ import submissionRoutes from "./routes/submission.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import tiktokRoutes from "./routes/tiktok.routes.js";
 import statsRoutes from "./routes/stats.routes.js";
+import internalRoutes from "./routes/internal.routes.js";
+import { errorMiddleware, notFoundMiddleware } from "./middleware/error.js";
 
 const app = express();
 
@@ -56,11 +58,11 @@ app.use("/api/campaigns", campaignRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/internal", internalRoutes);
 
 // ── 404 handler ────────────────────────────────
-app.use((_req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
 // ── Start server (skipped on Vercel — it handles listening) ──
 if (!process.env.VERCEL) {

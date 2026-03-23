@@ -3,18 +3,26 @@ import { FolderOpen } from "lucide-react";
 import { CampaignCard } from "../../components/CampaignCard";
 import { Spinner } from "../../components/Spinner";
 import { useTranslation } from "react-i18next";
+import { getApiErrorMessage } from "../../services/api";
 import { getMyJoinedCampaigns } from "../../services/campaign.service";
 import type { Campaign } from "../../types";
 
 export function MyCampaignsPage() {
   const [myCampaigns, setMyCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
     getMyJoinedCampaigns()
-      .then((c) => setMyCampaigns(c))
-      .catch(() => setMyCampaigns([]))
+      .then((c) => {
+        setMyCampaigns(c);
+        setError(null);
+      })
+      .catch((err) => {
+        setMyCampaigns([]);
+        setError(getApiErrorMessage(err, "Failed to load joined campaigns"));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -36,6 +44,12 @@ export function MyCampaignsPage() {
           {t("myCampaignsPage.subtitle")}
         </p>
       </div>
+
+      {error && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
 
       {myCampaigns.length === 0 ? (
         <div className="card flex flex-col items-center justify-center rounded-xl py-20 text-center">

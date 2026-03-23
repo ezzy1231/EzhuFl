@@ -4,6 +4,7 @@ import { Spinner } from "../../components/Spinner";
 import { useTranslation } from "react-i18next";
 import type { Campaign } from "../../types";
 import { Search } from "lucide-react";
+import { getApiErrorMessage } from "../../services/api";
 import { getAllCampaigns } from "../../services/campaign.service";
 
 export function CampaignsPage() {
@@ -11,12 +12,19 @@ export function CampaignsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
     getAllCampaigns()
-      .then((c) => setCampaigns(c))
-      .catch(() => setCampaigns([]))
+      .then((c) => {
+        setCampaigns(c);
+        setError(null);
+      })
+      .catch((err) => {
+        setCampaigns([]);
+        setError(getApiErrorMessage(err, "Failed to load campaigns"));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -74,6 +82,11 @@ export function CampaignsPage() {
       </div>
 
       {/* Content */}
+      {error && !loading && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
       {loading ? (
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />

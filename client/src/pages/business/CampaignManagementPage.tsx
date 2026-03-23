@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ExternalLink, Trophy, Users, DollarSign, Clock } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
+import { getApiErrorMessage } from "../../services/api";
 import { getCampaignById, getLeaderboard, refreshCampaignMetrics } from "../../services/campaign.service";
 import type { Campaign, LeaderboardEntry } from "../../types";
 
@@ -13,19 +14,37 @@ export function CampaignManagementPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [brokenProfilePhotos, setBrokenProfilePhotos] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!id) return;
-    Promise.all([
-      getCampaignById(id).catch(() => null),
-      getLeaderboard(id).catch(() => []),
-    ])
-      .then(([c, lb]) => {
-        setCampaign(c);
-        setLeaderboard(lb);
-      })
-      .finally(() => setLoading(false));
+    const campaignId = id;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const campaignData = await getCampaignById(campaignId);
+        setCampaign(campaignData);
+      } catch (err) {
+        setCampaign(null);
+        setError(getApiErrorMessage(err, "Failed to load campaign"));
+      }
+
+      try {
+        const leaderboardData = await getLeaderboard(campaignId);
+        setLeaderboard(leaderboardData);
+      } catch (err) {
+        setLeaderboard([]);
+        setError((current) => current || getApiErrorMessage(err, "Failed to load leaderboard"));
+      }
+
+      setLoading(false);
+    }
+
+    void load();
   }, [id]);
 
   if (loading) {
@@ -51,6 +70,11 @@ export function CampaignManagementPage() {
 
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
       <Link
         to="/business/campaigns"
         className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
@@ -139,9 +163,12 @@ export function CampaignManagementPage() {
                 setRefreshing(true);
                 try {
                   await refreshCampaignMetrics(id);
-                  const lb = await getLeaderboard(id).catch(() => []);
+                  const lb = await getLeaderboard(id);
                   setLeaderboard(lb);
-                } catch {}
+                  setError(null);
+                } catch (err) {
+                  setError(getApiErrorMessage(err, "Failed to refresh leaderboard"));
+                }
                 setRefreshing(false);
               }}
               disabled={refreshing}

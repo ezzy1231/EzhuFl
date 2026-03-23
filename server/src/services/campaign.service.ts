@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabase.js";
+import { AppError } from "../lib/errors.js";
 import { getLeaderboard } from "./leaderboard.service.js";
 import type {
   DbCampaign,
@@ -138,8 +139,12 @@ export async function joinCampaign(
 ): Promise<void> {
   // Check campaign exists and is active
   const campaign = await getCampaignById(campaignId);
-  if (!campaign) throw new Error("Campaign not found");
-  if (campaign.status !== "ACTIVE") throw new Error("Campaign is not active");
+  if (!campaign) {
+    throw new AppError(404, "Campaign not found", "NOT_FOUND");
+  }
+  if (campaign.status !== "ACTIVE") {
+    throw new AppError(409, "Campaign is not active", "CONFLICT");
+  }
 
   // Check not already joined
   const { data: existing } = await supabase
@@ -149,7 +154,9 @@ export async function joinCampaign(
     .eq("user_id", userId)
     .single();
 
-  if (existing) throw new Error("Already joined this campaign");
+  if (existing) {
+    throw new AppError(409, "Already joined this campaign", "CONFLICT");
+  }
 
   const { error } = await supabase.from("participants").insert({
     campaign_id: campaignId,
@@ -157,6 +164,26 @@ export async function joinCampaign(
   });
 
   if (error) throw error;
+}
+
+export async function canManageCampaign(
+  campaignId: string,
+  userId: string,
+  role: "BUSINESS" | "INFLUENCER" | "ADMIN"
+): Promise<boolean> {
+  if (role === "ADMIN") {
+    return true;
+  }
+
+  const { data, error } = await supabase
+    .from("campaigns")
+    .select("id")
+    .eq("id", campaignId)
+    .eq("business_id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return !!data;
 }
 
 /**
@@ -233,8 +260,12 @@ export async function completeCampaign(
     .eq("id", campaignId)
     .single();
 
-  if (fetchErr || !campaign) throw new Error("Campaign not found");
-  if (campaign.status === "COMPLETED") throw new Error("Campaign already completed");
+  if (fetchErr || !campaign) {
+    throw new AppError(404, "Campaign not found", "NOT_FOUND");
+  }
+  if (campaign.status === "COMPLETED") {
+    throw new AppError(409, "Campaign already completed", "CONFLICT");
+  }
 
   // 2. Mark as COMPLETED
   const { error: updateErr } = await supabase

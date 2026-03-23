@@ -14,6 +14,7 @@ interface Env {
   SUPABASE_SERVICE_ROLE_KEY: string;
   PORT: number;
   CLIENT_URL: string;
+  CRON_SECRET?: string;
   RAPIDAPI_KEY?: string;
   TIKTOK_RAPIDAPI_HOST?: string;
   INSTAGRAM_RAPIDAPI_HOST?: string;
@@ -41,6 +42,7 @@ function getEnv(): Env {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY!,
     PORT: parseInt(process.env.PORT || "3001", 10),
     CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
+    CRON_SECRET: process.env.CRON_SECRET,
     RAPIDAPI_KEY: process.env.RAPIDAPI_KEY,
     TIKTOK_RAPIDAPI_HOST: process.env.TIKTOK_RAPIDAPI_HOST,
     INSTAGRAM_RAPIDAPI_HOST: process.env.INSTAGRAM_RAPIDAPI_HOST,

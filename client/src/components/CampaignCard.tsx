@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Users, CheckCircle, UserPlus } from "lucide-react";
 import { joinCampaign } from "../services/campaign.service";
+import { isApiError } from "../services/api";
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -77,8 +78,8 @@ export function CampaignCard({ campaign, linkPrefix, showJoin }: CampaignCardPro
     try {
       await joinCampaign(campaign.id);
       setJoined(true);
-    } catch (err: any) {
-      if (err?.response?.status === 409) {
+    } catch (err) {
+      if (isApiError(err) && err.status === 409) {
         setJoined(true);
       }
     } finally {
@@ -89,7 +90,7 @@ export function CampaignCard({ campaign, linkPrefix, showJoin }: CampaignCardPro
   return (
     <Link
       to={`${linkPrefix}/${campaign.id}`}
-      className="card group block overflow-hidden rounded-xl transition-all duration-200 hover:scale-[1.01] hover:shadow-lg"
+      className="card group block overflow-hidden"
     >
       {/* Cover Image */}
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-brand/20 to-purple-500/20">

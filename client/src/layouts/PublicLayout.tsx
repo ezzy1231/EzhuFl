@@ -35,14 +35,14 @@ export function PublicLayout() {
             <ThemeToggle />
             <Link
               to="/login"
-              className="text-sm font-medium transition-colors hover:opacity-80"
+              className="btn px-3 py-2 text-sm transition-colors hover:opacity-80"
               style={{ color: "var(--text-secondary)" }}
             >
               {t("publicLayout.logIn")}
             </Link>
             <Link
               to="/signup"
-              className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover"
+              className="btn btn-primary px-4 py-2 text-sm"
             >
               {t("publicLayout.getStarted")}
             </Link>

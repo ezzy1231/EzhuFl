@@ -1,5 +1,11 @@
 {
   "version": 2,
+  "crons": [
+    {
+      "path": "/api/internal/cron/complete-expired-campaigns",
+      "schedule": "*/15 * * * *"
+    }
+  ],
   "builds": [
     {
       "src": "src/index.ts",

@@ -9,6 +9,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Spinner } from "../../components/Spinner";
+import { getApiErrorMessage } from "../../services/api";
 import * as adminService from "../../services/admin.service";
 import type { BusinessProfile, BusinessVerificationStatus } from "../../types";
 
@@ -42,18 +43,30 @@ export function BusinessListPage() {
   const activeStatus = searchParams.get("status") || "";
   const [businesses, setBusinesses] = useState<BusinessProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
     adminService
       .getBusinesses(activeStatus || undefined)
-      .then(setBusinesses)
-      .catch(console.error)
+      .then((value) => {
+        setBusinesses(value);
+        setError(null);
+      })
+      .catch((err) => {
+        setBusinesses([]);
+        setError(getApiErrorMessage(err, "Failed to load businesses"));
+      })
       .finally(() => setLoading(false));
   }, [activeStatus]);
 
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+          {error}
+        </div>
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
           Business Verification
